@@ -229,9 +229,9 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
               {skills.soft.filter(s => s).map((s, i) => (
                 <span key={i} style={{
                   display: 'inline-block', padding: '3px 10px',
-                  background: 'rgba(0,0,0,0.04)', color: '#475569',
-                  borderRadius: 4, fontSize: '0.72rem', fontWeight: 500,
-                  border: '1px solid rgba(0,0,0,0.06)',
+                  background: hexToRgba(tc, 0.1), color: darkenColor(tc, 0.15),
+                  borderRadius: 4, fontSize: '0.72rem', fontWeight: 600,
+                  border: `1px solid ${hexToRgba(tc, 0.18)}`,
                 }}>
                   {s}
                 </span>
@@ -293,6 +293,28 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
           </section>
         )}
 
+        {/* CERTIFICATIONS — moved to top */}
+        {certifications.some(c => c) && (
+          <section style={{ marginBottom: 24 }}>
+            <MainSectionTitle text="Certifications" color={tc} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {certifications.filter(c => c).map((cert, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    width: 18, height: 18, borderRadius: 4,
+                    background: hexToRgba(tc, 0.1), border: `1px solid ${hexToRgba(tc, 0.2)}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <span style={{ fontSize: 9, color: tc }}>✦</span>
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: '#374151' }}>{cert}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* EXPERIENCE */}
         {experience.some(e => e.company || e.role) && (
           <section style={{ marginBottom: 24, flex: 1 }}>
@@ -350,27 +372,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
           </section>
         )}
 
-        {/* CERTIFICATIONS */}
-        {certifications.some(c => c) && (
-          <section>
-            <MainSectionTitle text="Certifications" color={tc} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {certifications.filter(c => c).map((cert, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{
-                    width: 18, height: 18, borderRadius: 4,
-                    background: hexToRgba(tc, 0.1), border: `1px solid ${hexToRgba(tc, 0.2)}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <span style={{ fontSize: 9, color: tc }}>✦</span>
-                  </span>
-                  <span style={{ fontSize: '0.8rem', color: '#374151' }}>{cert}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+
       </main>
     </div>
   )

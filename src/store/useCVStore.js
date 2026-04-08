@@ -300,7 +300,12 @@ export const useCVStore = create((set, get) => ({
           'Berpikir kritis',
         ],
       },
-      certifications: ['Adobe Certified Professional – Photoshop, 2021'],
+      certifications: [
+        'Adobe Certified Professional – Photoshop, 2021',
+        'Google UX Design Professional Certificate, 2022',
+        'Certified Graphic Designer (CGD) – AIGA, 2021',
+        'HubSpot Content Marketing Certification, 2022',
+      ],
     }),
 
   // Reset

@@ -196,9 +196,9 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
                     {skills.soft.filter(s => s).map((s, i) => (
                       <span key={i} style={{
                         display: 'inline-block', padding: '2px 8px',
-                        background: 'rgba(255,255,255,0.06)', color: sidebarLight,
-                        borderRadius: 4, fontSize: '7pt', fontWeight: 500,
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: hexToRgba(tc, 0.15), color: lightenColor(tc, 0.6),
+                        borderRadius: 4, fontSize: '7pt', fontWeight: 600,
+                        border: `1px solid ${hexToRgba(tc, 0.25)}`,
                         lineHeight: 1.6,
                       }}>
                         {s}
@@ -233,29 +233,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
             </section>
           )}
 
-          {/* SERTIFIKASI in sidebar */}
-          {certifications.some(c => c) && (
-            <section>
-              <SidebarHeading text="SERTIFIKASI" color={tc} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                {certifications.filter(c => c).map((cert, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                    <span style={{
-                      width: 16, height: 16, borderRadius: 4,
-                      background: hexToRgba(tc, 0.2), border: `1px solid ${hexToRgba(tc, 0.3)}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0, marginTop: 1,
-                    }}>
-                      <span style={{ fontSize: 9, color: tc }}>✦</span>
-                    </span>
-                    <span style={{ fontSize: '7.5pt', color: sidebarText, lineHeight: 1.5 }}>
-                      {cert}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+
         </div>
 
         {/* Bottom accent bar */}
@@ -283,6 +261,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
           border: `1.5px solid ${hexToRgba(tc, 0.04)}`,
         }} />
 
+
         {/* RINGKASAN */}
         {summary && (
           <section style={{ marginBottom: 26, position: 'relative', zIndex: 1 }}>
@@ -297,14 +276,14 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
           </section>
         )}
 
-        {/* PENGALAMAN — flex:1 fills remaining space */}
+        {/* PENGALAMAN */}
         {experience.some(e => e.company || e.role) && (
-          <section style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
+          <section style={{ position: 'relative', zIndex: 1, marginBottom: 24 }}>
             <SectionTitle text="PENGALAMAN KERJA" color={tc} />
             <div style={{
-              marginTop: 12, flex: 1,
+              marginTop: 12,
               display: 'flex', flexDirection: 'column',
-              justifyContent: 'flex-start', gap: 20,
+              gap: 20,
             }}>
               {experience.filter(e => e.company || e.role).map((exp, i) => (
                 <div key={i} style={{ display: 'flex', gap: 14 }}>
@@ -359,6 +338,31 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
             </div>
           </section>
         )}
+
+        {/* SERTIFIKASI — right after Pengalaman */}
+        {certifications.some(c => c) && (
+          <section style={{ marginBottom: 24, position: 'relative', zIndex: 1 }}>
+            <SectionTitle text="SERTIFIKASI" color={tc} />
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {certifications.filter(c => c).map((cert, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    width: 20, height: 20, borderRadius: 6,
+                    background: hexToRgba(tc, 0.1), border: `1px solid ${hexToRgba(tc, 0.15)}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <span style={{ fontSize: 10, color: tc }}>✦</span>
+                  </span>
+                  <span style={{ fontSize: '9.5pt', color: '#374151', lineHeight: 1.5 }}>
+                    {cert}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
       </main>
     </div>
   )
