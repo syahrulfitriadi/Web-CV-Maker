@@ -1,17 +1,19 @@
 /**
- * Classic Template — Exact port of Referensi CV 1 (code.html)
- * Sidebar: #E8EAEB, 38% width, p-10
- * Section title: flex + ::after line (replicated with div)
- * Name: text-6xl (#0077B6), title: italic font-light text-xl
- * Photo: aspect-square full width with gradient fade
- * Contact: circle icons, sidebar-text 8.5pt
- * Skills: sidebar-heading 11pt, sidebar-sub-heading 9pt
- * Main: flex-1 p-10 pt-12, section spacing space-y-10
- * Body text: 10pt #374151 line-height 1.5
+ * Classic Template — v4
+ * Dark sidebar, circular photo, better vertical space distribution
  */
 
 import { getPhotoStyle } from '../utils/photoStyle'
 import { getFontConfig, migrateFontId } from '../utils/fonts'
+
+function hexToRgba(hex, alpha) {
+  try {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r},${g},${b},${alpha})`
+  } catch { return `rgba(0,119,182,${alpha})` }
+}
 
 export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFamily = 'inter' }) {
   const { personalInfo, summary, experience, education, skills, certifications } = data
@@ -19,68 +21,79 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
   const fontCfg = getFontConfig(migrateFontId(fontFamily))
   const ff = fontCfg.body
 
+  const nameParts = (personalInfo.name || 'Nama').split(' ')
+  const firstName = nameParts[0]
+  const lastName = nameParts.slice(1).join(' ')
+
+  const sidebarBg = '#1e293b'
+  const sidebarText = '#cbd5e1'
+
   return (
     <div style={{
       width: '100%', height: '100%', display: 'flex',
       fontFamily: ff, background: 'white', overflow: 'hidden',
     }}>
-      {/* ═══════ LEFT SIDEBAR (w-[38%] bg-[#E8EAEB]) ═══════ */}
-      <aside style={{ width: '38%', background: '#E8EAEB', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      {/* ═══════ LEFT SIDEBAR ═══════ */}
+      <aside style={{
+        width: '35%', background: sidebarBg, display: 'flex',
+        flexDirection: 'column', flexShrink: 0, overflow: 'hidden',
+      }}>
+        {/* Accent top */}
+        <div style={{ height: 5, background: tc, flexShrink: 0 }} />
 
-        {/* Profile Header — p-10 pb-4 */}
-        <div style={{ padding: '32px 32px 12px' }}>
+        {/* Photo */}
+        <div style={{ padding: '30px 0 16px', display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+          {personalInfo.photoPreview ? (
+            <div style={{
+              width: 170, height: 170, borderRadius: '50%', overflow: 'hidden',
+              border: `4px solid ${tc}`, flexShrink: 0,
+              background: '#111', boxShadow: `0 0 0 3px ${hexToRgba(tc, 0.3)}`,
+            }}>
+              <img src={personalInfo.photoPreview} alt="Profile"
+                style={getPhotoStyle(personalInfo.photoCrop)}
+              />
+            </div>
+          ) : (
+            <div style={{
+              width: 170, height: 170, borderRadius: '50%',
+              border: `4px solid ${tc}`, background: '#334155',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontSize: 48, color: '#64748b' }}>👤</span>
+            </div>
+          )}
+        </div>
+
+        {/* Name + Title */}
+        <div style={{ padding: '0 24px 22px', textAlign: 'center', flexShrink: 0 }}>
           <h1 style={{
-            fontSize: 52, fontWeight: 400, color: tc,
-            lineHeight: 1.1, margin: 0, fontFamily: ff,
+            fontSize: 28, fontWeight: 800, color: '#ffffff',
+            lineHeight: 1.15, margin: 0, fontFamily: ff,
           }}>
-            {personalInfo.name ? personalInfo.name.split(' ')[0] : 'Nama'}
+            {firstName}{lastName && <> {lastName}</>}
           </h1>
           <p style={{
-            fontSize: 16, fontStyle: 'italic', fontWeight: 300,
-            color: '#374151', margin: '-2px 0 0',
+            fontSize: 10, fontWeight: 600, letterSpacing: '0.2em',
+            color: tc, margin: '6px 0 0', textTransform: 'uppercase',
           }}>
             {personalInfo.title || 'Jabatan / Posisi'}
           </p>
         </div>
 
-        {/* Photo — aspect-square, full width, gradient fade */}
-        <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
-          {personalInfo.photoPreview ? (
-            <div style={{ width: '100%', aspectRatio: '1/1', overflow: 'hidden', background: '#111' }}>
-              <img src={personalInfo.photoPreview} alt="Profile"
-                style={{ ...getPhotoStyle(personalInfo.photoCrop), display: 'block' }}
-              />
-            </div>
-          ) : (
-            <div style={{
-              width: '100%', aspectRatio: '1/1', background: '#D1D5DB',
-              position: 'relative', overflow: 'hidden',
-            }}>
-              <div style={{
-                position: 'absolute', inset: 12,
-                border: '2px dashed #9CA3AF', borderRadius: 8,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(229,231,235,0.5)',
-              }}>
-                <span style={{ fontSize: 36, color: '#6B7280', marginBottom: 6 }}>📷</span>
-                <span style={{ fontSize: 8, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: 3 }}>
-                  Photo Placeholder
-                </span>
-              </div>
-            </div>
-          )}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
-            background: 'linear-gradient(to top, #E8EAEB, transparent)',
-            pointerEvents: 'none',
-          }} />
-        </div>
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 24px', flexShrink: 0 }} />
 
-        {/* Sidebar Content — px-8 py-6 space-y-8 */}
-        <div style={{ padding: '20px 28px 24px', flex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
+        {/* Sidebar content */}
+        <div style={{
+          padding: '22px 24px 28px', flex: 1,
+          display: 'flex', flexDirection: 'column',
+          gap: 24,
+          overflow: 'hidden',
+        }}>
 
-          {/* Contact Info */}
+          {/* KONTAK */}
           <section>
+            <SidebarHeading text="KONTAK" color={tc} />
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
                 { val: personalInfo.email, svg: emailSvg },
@@ -90,13 +103,13 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
               ].filter(i => i.val).map((item, i) => (
                 <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{
-                    width: 22, height: 22, background: tc, borderRadius: '50%',
+                    width: 24, height: 24, background: tc, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
                     <item.svg />
                   </span>
-                  <span style={{ fontSize: '8.5pt', lineHeight: 1.4, color: '#4B5563', wordBreak: 'break-all' }}>
+                  <span style={{ fontSize: '8.5pt', lineHeight: 1.4, color: sidebarText, wordBreak: 'break-all' }}>
                     {item.val}
                   </span>
                 </li>
@@ -104,83 +117,109 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
             </ul>
           </section>
 
-          {/* KEMAMPUAN — sidebar-heading 11pt */}
+          {/* KEMAMPUAN */}
           {(skills.hard.some(s => s) || skills.soft.some(s => s)) && (
             <section>
-              <h2 style={{
-                color: tc, fontWeight: 700, fontSize: '11pt',
-                marginBottom: 8, textTransform: 'uppercase',
-              }}>
-                KEMAMPUAN
-              </h2>
+              <SidebarHeading text="KEMAMPUAN" color={tc} />
 
               {skills.hard.some(s => s) && (
                 <div style={{ marginBottom: 12 }}>
-                  <h3 style={{ fontWeight: 700, color: tc, fontSize: '9pt', marginTop: 0, marginBottom: 4 }}>
-                    Tools
+                  <h3 style={{ fontWeight: 700, color: tc, fontSize: '8.5pt', marginTop: 0, marginBottom: 7 }}>
+                    Tools & Hard Skills
                   </h3>
-                  <p style={{ fontSize: '8.5pt', lineHeight: 1.4, color: '#4B5563', margin: 0 }}>
-                    {skills.hard.filter(s => s).join(', ')}.
-                  </p>
-                </div>
-              )}
-
-              {skills.hard.some(s => s) && (
-                <div style={{ marginBottom: 12 }}>
-                  <h3 style={{ fontWeight: 700, color: tc, fontSize: '9pt', marginTop: 10, marginBottom: 4 }}>
-                    Hard Skills
-                  </h3>
-                  <p style={{ fontSize: '8.5pt', lineHeight: 1.4, color: '#4B5563', margin: 0 }}>
-                    {skills.hard.filter(s => s).join(', ')}.
-                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                    {skills.hard.filter(s => s).map((s, i) => (
+                      <span key={i} style={{
+                        display: 'inline-block', padding: '3px 10px',
+                        background: hexToRgba(tc, 0.15), color: '#e2e8f0',
+                        borderRadius: 20, fontSize: '7.5pt', fontWeight: 500,
+                        border: `1px solid ${hexToRgba(tc, 0.3)}`,
+                        lineHeight: 1.5,
+                      }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {skills.soft.some(s => s) && (
                 <div>
-                  <h3 style={{ fontWeight: 700, color: tc, fontSize: '9pt', marginTop: 10, marginBottom: 4 }}>
+                  <h3 style={{ fontWeight: 700, color: tc, fontSize: '8.5pt', marginTop: 4, marginBottom: 7 }}>
                     Soft Skills
                   </h3>
-                  <p style={{ fontSize: '8.5pt', lineHeight: 1.4, color: '#4B5563', margin: 0 }}>
-                    {skills.soft.filter(s => s).join(', ')}.
-                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                    {skills.soft.filter(s => s).map((s, i) => (
+                      <span key={i} style={{
+                        display: 'inline-block', padding: '3px 10px',
+                        background: hexToRgba(tc, 0.15), color: '#e2e8f0',
+                        borderRadius: 20, fontSize: '7.5pt', fontWeight: 500,
+                        border: `1px solid ${hexToRgba(tc, 0.3)}`,
+                        lineHeight: 1.5,
+                      }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </section>
           )}
+
+          {/* PENDIDIKAN */}
+          {education.some(e => e.institution) && (
+            <section>
+              <SidebarHeading text="PENDIDIKAN" color={tc} />
+              {education.filter(e => e.institution).map((edu, i) => (
+                <div key={i} style={{ marginBottom: 10 }}>
+                  <p style={{ fontWeight: 700, fontSize: '9pt', color: '#ffffff', margin: '0 0 2px' }}>
+                    {edu.institution}
+                  </p>
+                  <p style={{ fontSize: '8.5pt', color: sidebarText, margin: '0 0 1px' }}>
+                    {edu.degree}{edu.field ? ` ${edu.field}` : ''}
+                    {edu.gpa ? ` — IPK ${edu.gpa}` : ''}
+                  </p>
+                  {edu.startDate && (
+                    <p style={{ fontSize: '8pt', color: '#64748b', margin: 0 }}>
+                      {edu.startDate} – {edu.endDate || 'Sekarang'}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </section>
+          )}
         </div>
+
+        {/* Bottom accent */}
+        <div style={{ height: 5, background: tc, flexShrink: 0 }} />
       </aside>
 
-      {/* ═══════ MAIN CONTENT (flex-1 p-10 pt-12 space-y-10) ═══════ */}
+      {/* ═══════ MAIN CONTENT ═══════ */}
       <main style={{
-        flex: 1, padding: '40px 36px',
-        display: 'flex', flexDirection: 'column', gap: 32,
+        flex: 1, padding: '38px 38px',
+        display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
       }}>
         {/* RINGKASAN */}
         {summary && (
-          <section>
+          <section style={{ marginBottom: 28 }}>
             <SectionTitle text="RINGKASAN" color={tc} />
-            <p style={{ fontSize: '10pt', lineHeight: 1.5, color: '#374151', marginTop: 12 }}>
+            <p style={{ fontSize: '10.5pt', lineHeight: 1.7, color: '#374151', margin: '12px 0 0', textAlign: 'justify' }}>
               {summary}
             </p>
           </section>
         )}
 
-        {/* PENDIDIKAN */}
-        {education.some(e => e.institution) && (
-          <section>
-            <SectionTitle text="PENDIDIKAN" color={tc} />
-            <div style={{ marginTop: 12 }}>
-              {education.filter(e => e.institution).map((edu, i) => (
-                <div key={i} style={{ marginBottom: 10 }}>
-                  <h3 style={{ color: tc, fontWeight: 700, fontStyle: 'italic', fontSize: 13, margin: 0 }}>
-                    {edu.institution.toUpperCase()}
-                    {edu.startDate && ` (${edu.startDate} - ${edu.endDate || 'Sekarang'})`}
-                  </h3>
-                  <p style={{ fontSize: '10pt', color: '#374151', margin: '3px 0 0' }}>
-                    {edu.degree}{edu.field ? ` ${edu.field}` : ''}
-                    {edu.gpa ? ` — IPK ${edu.gpa}` : ''}
+        {/* SERTIFIKASI */}
+        {certifications.some(c => c) && (
+          <section style={{ marginBottom: 28 }}>
+            <SectionTitle text="SERTIFIKASI" color={tc} />
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {certifications.filter(c => c).map((cert, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: tc, flexShrink: 0 }} />
+                  <p style={{ fontSize: '10pt', color: '#374151', margin: 0 }}>
+                    {cert}
                   </p>
                 </div>
               ))}
@@ -188,41 +227,39 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
           </section>
         )}
 
-        {/* SERTIFIKASI */}
-        {certifications.some(c => c) && (
-          <section>
-            <SectionTitle text="SERTIFIKASI" color={tc} />
-            <div style={{ marginTop: 12 }}>
-              {certifications.filter(c => c).map((cert, i) => (
-                <p key={i} style={{ fontSize: '10pt', color: '#374151', fontStyle: 'italic', margin: '0 0 4px' }}>
-                  {cert}
-                </p>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* PENGALAMAN */}
+        {/* PENGALAMAN — flex:1 fills remaining space */}
         {experience.some(e => e.company || e.role) && (
-          <section>
+          <section style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <SectionTitle text="PENGALAMAN" color={tc} />
-            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div style={{
+              marginTop: 14, flex: 1,
+              display: 'flex', flexDirection: 'column',
+              justifyContent: 'flex-start', gap: 24,
+            }}>
               {experience.filter(e => e.company || e.role).map((exp, i) => (
-                <div key={i}>
-                  <h3 style={{ color: tc, fontWeight: 700, fontSize: 14, margin: '0 0 3px' }}>
-                    {exp.company}{exp.location ? ` — ${exp.location}` : ''}
-                  </h3>
-                  <p style={{ fontSize: '10pt', fontStyle: 'italic', color: '#374151', margin: '0 0 10px' }}>
-                    {exp.role}
-                    {exp.startDate && ` (${exp.startDate} – ${exp.current ? 'Sekarang' : exp.endDate || ''})`}
-                  </p>
-                  <ul style={{ listStyleType: 'disc', margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {exp.bullets?.filter(b => b).map((b, j) => (
-                      <li key={j} style={{ fontSize: '9pt', lineHeight: 1.5, color: '#374151' }}>
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
+                <div key={i} style={{ display: 'flex', gap: 14 }}>
+                  {/* Timeline */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, paddingTop: 5 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: tc, flexShrink: 0 }} />
+                    <div style={{ width: 2, flex: 1, background: hexToRgba(tc, 0.2), marginTop: 3 }} />
+                  </div>
+                  {/* Content */}
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ color: tc, fontWeight: 700, fontSize: 14, margin: '0 0 3px' }}>
+                      {exp.company}{exp.location ? ` — ${exp.location}` : ''}
+                    </h3>
+                    <p style={{ fontSize: '10pt', fontStyle: 'italic', color: '#64748b', margin: '0 0 8px' }}>
+                      {exp.role}
+                      {exp.startDate && ` (${exp.startDate} – ${exp.current ? 'Sekarang' : exp.endDate || ''})`}
+                    </p>
+                    <ul style={{ listStyleType: 'disc', margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                      {exp.bullets?.filter(b => b).map((b, j) => (
+                        <li key={j} style={{ fontSize: '9.5pt', lineHeight: 1.6, color: '#374151' }}>
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               ))}
             </div>
@@ -233,25 +270,39 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
   )
 }
 
-/**
- * Section title with flex ::after line — matches .section-title::after from HTML
- */
-function SectionTitle({ text, color }) {
+/* ─── Sidebar heading ─── */
+function SidebarHeading({ text, color }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+    <div style={{ marginBottom: 10 }}>
       <h2 style={{
-        fontSize: 18, fontWeight: 800, color,
-        textTransform: 'uppercase', letterSpacing: '0.05em',
-        margin: 0, whiteSpace: 'nowrap',
+        color: '#ffffff', fontWeight: 800, fontSize: '10pt',
+        textTransform: 'uppercase', letterSpacing: '0.12em',
+        margin: 0,
       }}>
         {text}
       </h2>
-      <div style={{ flexGrow: 1, height: 1.5, background: color }} />
+      <div style={{ width: 30, height: 2.5, background: color, borderRadius: 2, marginTop: 5 }} />
     </div>
   )
 }
 
-/* ─── Modern SVG Icons (stroke-style, Lucide-inspired) ─── */
+/* ─── Section title (main content) ─── */
+function SectionTitle({ text, color }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <h2 style={{
+        fontSize: 16, fontWeight: 800, color,
+        textTransform: 'uppercase', letterSpacing: '0.06em',
+        margin: 0, whiteSpace: 'nowrap',
+      }}>
+        {text}
+      </h2>
+      <div style={{ flexGrow: 1, height: 1.5, background: color, opacity: 0.35 }} />
+    </div>
+  )
+}
+
+/* ─── SVG Icons ─── */
 function emailSvg() {
   return (
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -285,4 +336,3 @@ function linkedinSvg() {
     </svg>
   )
 }
-
