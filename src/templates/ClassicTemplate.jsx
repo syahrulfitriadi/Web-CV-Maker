@@ -10,6 +10,8 @@
  * Body text: 10pt #374151 line-height 1.5
  */
 
+import { getPhotoStyle } from '../utils/photoStyle'
+
 export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFamily = 'sans' }) {
   const { personalInfo, summary, experience, education, skills, certifications } = data
   const tc = themeColor
@@ -42,11 +44,13 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
         </div>
 
         {/* Photo — aspect-square, full width, gradient fade */}
-        <div style={{ position: 'relative', width: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
           {personalInfo.photoPreview ? (
-            <img src={personalInfo.photoPreview} alt="Profile"
-              style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
-            />
+            <div style={{ width: '100%', aspectRatio: '1/1', overflow: 'hidden', background: '#111' }}>
+              <img src={personalInfo.photoPreview} alt="Profile"
+                style={{ ...getPhotoStyle(personalInfo.photoCrop), display: 'block' }}
+              />
+            </div>
           ) : (
             <div style={{
               width: '100%', aspectRatio: '1/1', background: '#D1D5DB',

@@ -10,6 +10,8 @@
  * Experience: font-bold 0.95rem, bullets disc, 0.85rem
  */
 
+import { getPhotoStyle } from '../utils/photoStyle'
+
 export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamily = 'sans' }) {
   const { personalInfo, summary, experience, education, skills, certifications } = data
   const tc = themeColor
@@ -52,27 +54,29 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
       color: '#101b22',
     }}>
       {/* ═══════ LEFT SIDEBAR (35%, #E0F2FE) ═══════ */}
-      <aside style={{ width: '35%', background: sidebarBg, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      <aside style={{ width: '35%', background: sidebarBg, display: 'flex', flexDirection: 'column', flexShrink: 0, overflow: 'hidden' }}>
 
-        {/* Profile Photo — 180px circle, 15px border */}
-        <div style={{ padding: '40px 20px 16px', display: 'flex', justifyContent: 'center' }}>
+        {/* Profile Photo — 180px circle, subtle white border */}
+        <div style={{ padding: '28px 16px 12px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
           {personalInfo.photoPreview ? (
-            <img src={personalInfo.photoPreview} alt="Profile"
-              style={{
-                width: 150, height: 150, borderRadius: '50%', objectFit: 'cover',
-                objectPosition: 'top', border: `12px solid ${headerBg}`,
-                background: 'white', flexShrink: 0,
-              }}
-            />
+            <div style={{
+              width: 160, height: 160, borderRadius: '50%', overflow: 'hidden',
+              border: '4px solid white', flexShrink: 0,
+              background: '#111', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+            }}>
+              <img src={personalInfo.photoPreview} alt="Profile"
+                style={getPhotoStyle(personalInfo.photoCrop)}
+              />
+            </div>
           ) : (
             <div style={{
-              width: 150, height: 150, borderRadius: '50%',
-              border: `12px solid ${headerBg}`,
+              width: 160, height: 160, borderRadius: '50%',
+              border: '4px solid white',
               background: '#f3f4f6',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{ fontSize: 48, color: '#9CA3AF' }}>👤</span>
-              <span style={{ fontSize: 7, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', marginTop: 2 }}>Insert Photo</span>
+              <span style={{ fontSize: 54, color: '#9CA3AF' }}>👤</span>
+              <span style={{ fontSize: 8, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', marginTop: 2 }}>Insert Photo</span>
             </div>
           )}
         </div>

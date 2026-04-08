@@ -11,6 +11,7 @@ const defaultCV = {
     linkedin: '',
     photo: null,
     photoPreview: null,
+    photoCrop: { scale: 1.2, posX: 50, posY: 20 },
   },
   summary: '',
   experience: [
@@ -71,12 +72,21 @@ export const useCVStore = create((set, get) => ({
             ...state.personalInfo,
             photo: file,
             photoPreview: reader.result,
+            photoCrop: { scale: 1.2, posX: 50, posY: 20 },
           },
         }))
       }
       reader.readAsDataURL(file)
     }
   },
+
+  setPhotoCrop: (crop) =>
+    set((state) => ({
+      personalInfo: {
+        ...state.personalInfo,
+        photoCrop: { ...state.personalInfo.photoCrop, ...crop },
+      },
+    })),
 
   // Summary
   setSummary: (text) => set({ summary: text }),

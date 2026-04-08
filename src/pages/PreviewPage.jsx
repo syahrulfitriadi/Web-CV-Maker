@@ -1,9 +1,11 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
-import { Download, Palette, Type, ArrowLeft, Check } from 'lucide-react'
+import { Download, Palette, Type, ArrowLeft, Check, Loader2 } from 'lucide-react'
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
 
 const themeColors = [
   { name: 'Sky Blue', value: '#0ea5e9' },
@@ -24,21 +26,39 @@ export default function PreviewPage() {
   } = useCVStore()
 
   const previewRef = useRef(null)
+  const [isExporting, setIsExporting] = useState(false)
   const cvData = { personalInfo, summary, experience, education, skills, certifications }
 
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
     const element = previewRef.current
-    if (!element) return
-    const printWindow = window.open('', '_blank')
-    printWindow.document.write(`
-      <html><head><title>CV - ${personalInfo.name || 'Document'}</title>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-      <style>* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Inter', sans-serif; } @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }</style>
-      </head><body>${element.innerHTML}</body></html>
-    `)
-    printWindow.document.close()
-    setTimeout(() => { printWindow.print() }, 500)
-  }, [personalInfo.name])
+    if (!element || isExporting) return
+
+    setIsExporting(true)
+    try {
+      // Render the A4 div at full resolution
+      const canvas = await html2canvas(element, {
+        scale: 2, // high quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: 1123,
+      })
+
+      // Create A4 PDF (210mm x 297mm)
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const imgData = canvas.toDataURL('image/jpeg', 0.95)
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297)
+
+      const fileName = `CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}.pdf`
+      pdf.save(fileName)
+    } catch (err) {
+      console.error('PDF export error:', err)
+      alert('Gagal mengekspor PDF. Silakan coba lagi.')
+    } finally {
+      setIsExporting(false)
+    }
+  }, [personalInfo.name, isExporting])
 
   const TemplateComponent = selectedTemplate === 'classic' ? ClassicTemplate : ModernTemplate
 
@@ -57,11 +77,21 @@ export default function PreviewPage() {
             >
               <ArrowLeft style={{ width: 16, height: 16 }} /> Edit Data
             </button>
-            <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            <motion.button whileHover={isExporting ? {} : { scale: 1.03 }} whileTap={isExporting ? {} : { scale: 0.97 }}
               onClick={handleDownload}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', borderRadius: 12, background: '#0ea5e9', color: 'white', fontWeight: 600, fontSize: 14, border: 'none', cursor: 'pointer', boxShadow: '0 6px 20px rgba(14,165,233,0.3)' }}
+              disabled={isExporting}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '10px 24px', borderRadius: 12,
+                background: isExporting ? '#94a3b8' : '#0ea5e9', color: 'white', fontWeight: 600, fontSize: 14,
+                border: 'none', cursor: isExporting ? 'wait' : 'pointer',
+                boxShadow: isExporting ? 'none' : '0 6px 20px rgba(14,165,233,0.3)',
+              }}
             >
-              <Download style={{ width: 16, height: 16 }} /> Download PDF
+              {isExporting ? (
+                <><Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} /> Mengekspor...</>
+              ) : (
+                <><Download style={{ width: 16, height: 16 }} /> Download PDF</>
+              )}
             </motion.button>
           </div>
         </div>
