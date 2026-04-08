@@ -45,7 +45,7 @@ const defaultCV = {
   certifications: [''],
   selectedTemplate: 'classic',
   themeColor: '#0ea5e9',
-  fontFamily: 'sans',
+  fontFamily: 'inter',
   currentStep: 0,
 }
 

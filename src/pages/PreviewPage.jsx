@@ -3,9 +3,8 @@ import { motion } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
+import { FONT_OPTIONS, migrateFontId } from '../utils/fonts'
 import { Download, Palette, Type, ArrowLeft, Check, Loader2 } from 'lucide-react'
-import html2canvas from 'html2canvas'
-import { jsPDF } from 'jspdf'
 
 const themeColors = [
   { name: 'Sky Blue', value: '#0ea5e9' },
@@ -35,23 +34,101 @@ export default function PreviewPage() {
 
     setIsExporting(true)
     try {
-      // Render the A4 div at full resolution
-      const canvas = await html2canvas(element, {
-        scale: 2, // high quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        height: 1123,
+      // Wait for fonts to be loaded in the main document
+      if (document.fonts?.ready) await document.fonts.ready
+
+      // Collect all font-related link tags (preconnect + stylesheet)
+      const fontLinks = Array.from(
+        document.querySelectorAll('link[rel="preconnect"], link[href*="fonts.googleapis.com"]')
+      ).map(l => l.outerHTML).join('\n')
+
+      // Get the CV content HTML (all React inline styles are preserved)
+      const cvContent = element.innerHTML
+
+      // Build a print-optimized HTML document
+      const printHTML = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}</title>
+${fontLinks}
+<style>
+  @page {
+    size: 210mm 297mm;
+    margin: 0;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 794px;
+    height: 1123px;
+    overflow: hidden;
+    background: white;
+    /* Force print backgrounds and colors */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+</style>
+</head>
+<body>${cvContent}</body>
+</html>`
+
+      // Open a new window for printing
+      const printWin = window.open('', '_blank')
+      if (!printWin) {
+        alert('Popup diblokir oleh browser. Izinkan popup untuk situs ini, lalu coba lagi.')
+        setIsExporting(false)
+        return
+      }
+
+      printWin.document.open()
+      printWin.document.write(printHTML)
+      printWin.document.close()
+
+      // Wait for the new window to fully load content
+      await new Promise(resolve => {
+        if (printWin.document.readyState === 'complete') {
+          resolve()
+        } else {
+          printWin.addEventListener('load', resolve)
+        }
+        // Fallback timeout in case load event already fired
+        setTimeout(resolve, 2000)
       })
 
-      // Create A4 PDF (210mm x 297mm)
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const imgData = canvas.toDataURL('image/jpeg', 0.95)
-      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297)
+      // Wait for Google Fonts to load in the print window
+      if (printWin.document.fonts?.ready) {
+        await printWin.document.fonts.ready
+      }
 
-      const fileName = `CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}.pdf`
-      pdf.save(fileName)
+      // Wait for all images to load
+      const imgs = printWin.document.querySelectorAll('img')
+      if (imgs.length > 0) {
+        await Promise.all(
+          Array.from(imgs).map(img =>
+            img.complete && img.naturalWidth > 0
+              ? Promise.resolve()
+              : new Promise(r => { img.onload = r; img.onerror = r })
+          )
+        )
+      }
+
+      // Extra delay for final rendering settle
+      await new Promise(r => setTimeout(r, 300))
+
+      // Trigger print → user saves as PDF from the print dialog
+      printWin.focus()
+      printWin.print()
+
+      // Auto-close the print window after the dialog is dismissed
+      printWin.addEventListener('afterprint', () => printWin.close())
+      // Fallback: close after 2 minutes if afterprint event doesn't fire
+      setTimeout(() => { if (!printWin.closed) printWin.close() }, 120000)
+
     } catch (err) {
       console.error('PDF export error:', err)
       alert('Gagal mengekspor PDF. Silakan coba lagi.')
@@ -129,22 +206,39 @@ export default function PreviewPage() {
                 <Type style={{ width: 16, height: 16, color: '#0ea5e9' }} />
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>Font</span>
               </div>
-              {[{ label: 'Sans-serif', value: 'sans', ff: "'Inter', sans-serif" }, { label: 'Serif', value: 'serif', ff: "'Playfair Display', serif" }].map((opt) => (
-                <button key={opt.value} onClick={() => setFontFamily(opt.value)}
-                  style={{
-                    width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '10px 14px', borderRadius: 12, marginBottom: 6, fontSize: 14, cursor: 'pointer',
-                    fontFamily: opt.ff, transition: 'all 0.2s',
-                    background: fontFamily === opt.value ? '#eff6ff' : '#f8fafc',
-                    color: fontFamily === opt.value ? '#0369a1' : '#475569',
-                    border: fontFamily === opt.value ? '1.5px solid #bfdbfe' : '1.5px solid #e2e8f0',
-                    fontWeight: fontFamily === opt.value ? 600 : 400,
-                  }}
-                >
-                  {opt.label}
-                  {fontFamily === opt.value && <Check style={{ width: 16, height: 16 }} />}
-                </button>
-              ))}
+              <div style={{ maxHeight: 320, overflowY: 'auto', paddingRight: 4 }}>
+                {['Sans-Serif', 'Serif', 'Mixed'].map((cat) => {
+                  const fonts = FONT_OPTIONS.filter((f) => f.category === cat)
+                  if (fonts.length === 0) return null
+                  return (
+                    <div key={cat} style={{ marginBottom: 12 }}>
+                      <div style={{
+                        fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
+                        color: '#94a3b8', marginBottom: 6, paddingLeft: 4,
+                      }}>{cat}</div>
+                      {fonts.map((opt) => {
+                        const isActive = migrateFontId(fontFamily) === opt.id
+                        return (
+                          <button key={opt.id} onClick={() => setFontFamily(opt.id)}
+                            style={{
+                              width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                              padding: '8px 12px', borderRadius: 10, marginBottom: 4, fontSize: 13, cursor: 'pointer',
+                              fontFamily: opt.preview, transition: 'all 0.2s',
+                              background: isActive ? '#eff6ff' : '#f8fafc',
+                              color: isActive ? '#0369a1' : '#475569',
+                              border: isActive ? '1.5px solid #bfdbfe' : '1.5px solid transparent',
+                              fontWeight: isActive ? 600 : 400,
+                            }}
+                          >
+                            <span>{opt.label}</span>
+                            {isActive && <Check style={{ width: 14, height: 14, flexShrink: 0 }} />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Template */}

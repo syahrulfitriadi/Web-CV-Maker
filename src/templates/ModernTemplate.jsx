@@ -11,19 +11,17 @@
  */
 
 import { getPhotoStyle } from '../utils/photoStyle'
+import { getFontConfig, migrateFontId } from '../utils/fonts'
 
-export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamily = 'sans' }) {
+export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamily = 'inter' }) {
   const { personalInfo, summary, experience, education, skills, certifications } = data
   const tc = themeColor
   const sidebarBg = hexToRgba(tc, 0.12)
   const headerBg = hexToRgba(tc, 0.4)
 
-  const headingFont = fontFamily === 'serif'
-    ? "'Playfair Display', Georgia, serif"
-    : "'Montserrat', 'Inter', system-ui, sans-serif"
-  const bodyFont = fontFamily === 'serif'
-    ? "'Playfair Display', Georgia, serif"
-    : "'Open Sans', 'Inter', system-ui, sans-serif"
+  const fontCfg = getFontConfig(migrateFontId(fontFamily))
+  const headingFont = fontCfg.heading
+  const bodyFont = fontCfg.body
 
   const nameParts = (personalInfo.name || 'Nama Anda').split(' ')
   const firstName = nameParts[0]
@@ -56,11 +54,11 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
       {/* ═══════ LEFT SIDEBAR (35%, #E0F2FE) ═══════ */}
       <aside style={{ width: '35%', background: sidebarBg, display: 'flex', flexDirection: 'column', flexShrink: 0, overflow: 'hidden' }}>
 
-        {/* Profile Photo — 180px circle, subtle white border */}
+        {/* Profile Photo — 200px circle, subtle white border */}
         <div style={{ padding: '28px 16px 12px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
           {personalInfo.photoPreview ? (
             <div style={{
-              width: 160, height: 160, borderRadius: '50%', overflow: 'hidden',
+              width: 200, height: 200, borderRadius: '50%', overflow: 'hidden',
               border: '4px solid white', flexShrink: 0,
               background: '#111', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
             }}>
@@ -70,7 +68,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
             </div>
           ) : (
             <div style={{
-              width: 160, height: 160, borderRadius: '50%',
+              width: 200, height: 200, borderRadius: '50%',
               border: '4px solid white',
               background: '#f3f4f6',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -86,14 +84,19 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
           <SectionHeader title="Contact" />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              { val: personalInfo.address, icon: '📍' },
-              { val: personalInfo.website, icon: '💼' },
-              { val: personalInfo.linkedin, icon: '🔗' },
-              { val: personalInfo.email, icon: '✉️' },
-              { val: personalInfo.phone, icon: '📞' },
+              { val: personalInfo.address, Icon: LocationIcon },
+              { val: personalInfo.website, Icon: WebIcon },
+              { val: personalInfo.linkedin, Icon: LinkedInIcon },
+              { val: personalInfo.email, Icon: EmailIcon },
+              { val: personalInfo.phone, Icon: PhoneIcon },
             ].filter(i => i.val).map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: '0.8rem' }}>
-                <span style={{ width: 14, marginTop: 2, flexShrink: 0 }}>{item.icon}</span>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '0.8rem' }}>
+                <span style={{
+                  width: 26, height: 26, borderRadius: '50%', background: tc,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <item.Icon />
+                </span>
                 <span style={{ wordBreak: 'break-all', lineHeight: 1.4 }}>{item.val}</span>
               </div>
             ))}
@@ -224,4 +227,51 @@ function hexToRgba(hex, alpha) {
   } catch {
     return `rgba(59,130,246,${alpha})`
   }
+}
+
+/* ─── Modern SVG Contact Icons ─── */
+function LocationIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  )
+}
+
+function WebIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  )
+}
+
+function LinkedInIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  )
+}
+
+function EmailIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  )
+}
+
+function PhoneIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  )
 }
