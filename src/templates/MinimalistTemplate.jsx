@@ -54,7 +54,7 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
           {hasPhoto && (
             <div style={{
-              width: 72, height: 72, borderRadius: '50%', overflow: 'hidden',
+              width: 100, height: 100, borderRadius: '50%', overflow: 'hidden',
               flexShrink: 0, backgroundColor: '#f0f0f0',
               border: `2px solid ${hexToRgba(tc, 0.25)}`,
             }}>
