@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview Opsi Sidebar - CV Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 280px);
+    gap: 32px;
+    justify-content: center;
+    align-items: start;
+  }
+  .option-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .option-label {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #f1f5f9;
+  }
+  .option-label span {
+    font-size: 12px;
+    background: #0ea5e9;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  .option-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  /* Sidebar Card Styling */
+  .sidebar-mock {
+    width: 260px;
+    background: #eef2f7;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .section-header .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .section-header .icon.blue { background: #e0f2fe; color: #0ea5e9; }
+  .section-header .icon.purple { background: #ede9fe; color: #8b5cf6; }
+  .section-header .title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1e293b;
+  }
+
+  /* Color Swatches */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .color-swatch {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .color-swatch.active {
+    border: 3px solid #1e293b;
+  }
+  .color-swatch.active::after {
+    content: '✓';
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .color-input {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .color-hex {
+    font-size: 11px;
+    color: #64748b;
+    font-family: monospace;
+  }
+
+  /* Dropdown Select */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-styled {
+    width: 100%;
+    padding: 9px 32px 9px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #eff6ff;
+    color: #0369a1;
+    border: 1.5px solid #bfdbfe;
+    appearance: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+  }
+  .select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0369a1;
+    font-size: 10px;
+    pointer-events: none;
+  }
+
+  /* Segmented Toggle */
+  .toggle-group {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid #e2e8f0;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 7px 0;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    font-weight: 400;
+    background: #f8fafc;
+    color: #64748b;
+  }
+  .toggle-btn.active {
+    background: #0ea5e9;
+    color: white;
+    font-weight: 600;
+  }
+
+  /* Font List Item */
+  .font-item {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 8px;
+    margin-bottom: 3px;
+    font-size: 12px;
+    cursor: pointer;
+    background: #f8fafc;
+    color: #475569;
+    border: 1.5px solid transparent;
+    font-family: 'Inter', sans-serif;
+  }
+  .font-item.active {
+    background: #eff6ff;
+    color: #0369a1;
+    border: 1.5px solid #bfdbfe;
+    font-weight: 600;
+  }
+  .font-cat {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    padding-left: 4px;
+  }
+
+  /* Accordion Styles */
+  .accordion-item {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    width: 100%;
+    background: white;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+  }
+  .accordion-header .title-row {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .accordion-header .acc-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1e293b;
+  }
+  .accordion-header .acc-value {
+    font-size: 11px;
+    color: #94a3b8;
+  }
+  .accordion-header .chevron {
+    font-size: 12px;
+    color: #94a3b8;
+    transition: transform 0.2s;
+  }
+  .accordion-header .chevron.open {
+    transform: rotate(180deg);
+    color: #0ea5e9;
+  }
+  .accordion-body {
+    padding: 0 14px 14px;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: transparent;
+    color: #64748b;
+  }
+  .tab-btn.active {
+    background: #0ea5e9;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(14,165,233,0.3);
+  }
+
+  /* Comparison Table */
+  .comparison-section {
+    max-width: 940px;
+    margin: 48px auto 0;
+  }
+  .comparison-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e293b;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    border-bottom: 1px solid #334155;
+  }
+  th {
+    background: #334155;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+  td {
+    color: #cbd5e1;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  .badge-rec {
+    display: inline-block;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Opsi Optimalisasi Sidebar Pengaturan</h1>
+<p class="subtitle">Pilih salah satu opsi untuk memperpendek sidebar pengaturan CV yang terlalu panjang</p>
+
+<div class="options-grid">
+
+  <!-- ==================== OPSI A ==================== -->
+  <div class="option-wrapper">
+    <div class="option-label">Opsi A <span>Recommended</span></div>
+    <div class="option-desc">Font menjadi Dropdown Select</div>
+    <div class="sidebar-mock">
+
+      <!-- Warna Tema -->
+      <div class="card">
+        <div class="section-header">
+          <div class="icon blue">🎨</div>
+          <div class="title">Warna Tema</div>
+        </div>
+        <div class="color-grid">
+          <div class="color-swatch active" style="background:#0ea5e9"></div>
+          <div class="color-swatch" style="background:#6366f1"></div>
+          <div class="color-swatch" style="background:#10b981"></div>
+          <div class="color-swatch" style="background:#f43f5e"></div>
+          <div class="color-swatch" style="background:#f59e0b"></div>
+          <div class="color-swatch" style="background:#8b5cf6"></div>
+          <div class="color-swatch" style="background:#14b8a6"></div>
+          <div class="color-swatch" style="background:#475569"></div>
+        </div>
+        <div class="color-picker-row">
+          <input type="color" value="#0ea5e9" class="color-input" disabled>
+          <span class="color-hex">#0ea5e9</span>
+        </div>
+      </div>
+
+      <!-- Font as Dropdown -->
+      <div class="card">
+        <div class="section-header">
+          <div class="icon blue">✏️</div>
+          <div class="title">Font</div>
+        </div>
+        <div class="select-wrapper">
+          <select class="select-styled" disabled>
+            <optgroup label="Sans-Serif">
+              <option selected>Inter</option>
+              <option>Poppins</option>
+              <option>Montserrat</option>
+              <option>Roboto</option>
+            </optgroup>
+            <optgroup label="Serif">
+              <option>Playfair Display</option>
+              <option>Lora</option>
+            </optgroup>
+          </select>
+          <div class="select-arrow">▼</div>
+        </div>
+      </div>
+
+      <!-- Template -->
+      <div class="card">
+        <div class="section-header">
+          <div class="icon blue">📄</div>
+          <div class="title">Template</div>
+        </div>
+        <div class="select-wrapper">
+          <select class="select-styled" disabled>
+            <option>Classic</option>
+            <option>Modern</option>
+            <option>Minimalist</option>
+            <option selected>Creative</option>
+            <option>Executive</option>
+          </select>
+          <div class="select-arrow">▼</div>
+        </div>
+      </div>
+
+      <!-- PDF Size + Language -->
+      <div class="card">
+        <div class="section-header" style="margin-bottom:8px">
+          <div class="icon blue">📐</div>
+          <div class="title">Ukuran PDF</div>
+        </div>
+        <div class="toggle-group" style="margin-bottom:14px">
+          <button class="toggle-btn active">Sesuai Konten</button>
+          <button class="toggle-btn">A4 Penuh</button>
+        </div>
+        <div class="section-header" style="margin-bottom:8px">
+          <div class="icon blue">🌐</div>
+          <div class="title">Bahasa CV</div>
+        </div>
+        <div class="toggle-group">
+          <button class="toggle-btn active">🇮🇩 Indonesia</button>
+          <button class="toggle-btn">🇬🇧 English</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== OPSI B ==================== -->
+  <div class="option-wrapper">
+    <div class="option-label">Opsi B</div>
+    <div class="option-desc">Accordion — Section bisa buka/tutup</div>
+    <div class="sidebar-mock">
+
+      <!-- Warna Tema - EXPANDED -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="icon blue" style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:#e0f2fe;color:#0ea5e9">🎨</div>
+          <div class="title-row">
+            <div class="acc-title">Warna Tema</div>
+          </div>
+          <div class="chevron open">▼</div>
+        </button>
+        <div class="accordion-body">
+          <div class="color-grid">
+            <div class="color-swatch active" style="background:#0ea5e9"></div>
+            <div class="color-swatch" style="background:#6366f1"></div>
+            <div class="color-swatch" style="background:#10b981"></div>
+            <div class="color-swatch" style="background:#f43f5e"></div>
+            <div class="color-swatch" style="background:#f59e0b"></div>
+            <div class="color-swatch" style="background:#8b5cf6"></div>
+            <div class="color-swatch" style="background:#14b8a6"></div>
+            <div class="color-swatch" style="background:#475569"></div>
+          </div>
+          <div class="color-picker-row">
+            <input type="color" value="#0ea5e9" class="color-input" disabled>
+            <span class="color-hex">#0ea5e9</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Font - COLLAPSED -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="icon blue" style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:#e0f2fe;color:#0ea5e9">✏️</div>
+          <div class="title-row">
+            <div class="acc-title">Font</div>
+            <div class="acc-value">Inter (Sans-Serif)</div>
+          </div>
+          <div class="chevron">▼</div>
+        </button>
+      </div>
+
+      <!-- Template - COLLAPSED -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="icon blue" style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:#e0f2fe;color:#0ea5e9">📄</div>
+          <div class="title-row">
+            <div class="acc-title">Template</div>
+            <div class="acc-value">Creative</div>
+          </div>
+          <div class="chevron">▼</div>
+        </button>
+      </div>
+
+      <!-- PDF Size - COLLAPSED -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="icon blue" style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:#e0f2fe;color:#0ea5e9">📐</div>
+          <div class="title-row">
+            <div class="acc-title">Ukuran PDF</div>
+            <div class="acc-value">Sesuai Konten</div>
+          </div>
+          <div class="chevron">▼</div>
+        </button>
+      </div>
+
+      <!-- Language - COLLAPSED -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="icon blue" style="width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:#e0f2fe;color:#0ea5e9">🌐</div>
+          <div class="title-row">
+            <div class="acc-title">Bahasa CV</div>
+            <div class="acc-value">🇮🇩 Indonesia</div>
+          </div>
+          <div class="chevron">▼</div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== OPSI C ==================== -->
+  <div class="option-wrapper">
+    <div class="option-label">Opsi C</div>
+    <div class="option-desc">Tab Interface — 3 tab horizontal</div>
+    <div class="sidebar-mock">
+
+      <div class="card">
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="showTab('warna')">🎨 Warna</button>
+          <button class="tab-btn" onclick="showTab('font')">✏️ Font</button>
+          <button class="tab-btn" onclick="showTab('lainnya')">⚙️ Lainnya</button>
+        </div>
+
+        <!-- Tab: Warna (active) -->
+        <div id="tab-warna">
+          <div class="section-header">
+            <div class="title" style="font-size:12px;color:#94a3b8;font-weight:600">PILIH WARNA TEMA</div>
+          </div>
+          <div class="color-grid" style="margin-bottom:10px">
+            <div class="color-swatch active" style="background:#0ea5e9"></div>
+            <div class="color-swatch" style="background:#6366f1"></div>
+            <div class="color-swatch" style="background:#10b981"></div>
+            <div class="color-swatch" style="background:#f43f5e"></div>
+            <div class="color-swatch" style="background:#f59e0b"></div>
+            <div class="color-swatch" style="background:#8b5cf6"></div>
+            <div class="color-swatch" style="background:#14b8a6"></div>
+            <div class="color-swatch" style="background:#475569"></div>
+          </div>
+          <div class="color-picker-row">
+            <input type="color" value="#0ea5e9" class="color-input" disabled>
+            <span class="color-hex">#0ea5e9</span>
+          </div>
+        </div>
+
+        <!-- Tab: Font (hidden) -->
+        <div id="tab-font" style="display:none">
+          <div class="font-cat">Sans-Serif</div>
+          <div class="font-item active">Inter <span style="font-size:11px">✓</span></div>
+          <div class="font-item">Poppins</div>
+          <div class="font-item">Montserrat</div>
+          <div class="font-item">Manrope</div>
+          <div class="font-item">Raleway</div>
+          <div class="font-item">DM Sans</div>
+          <div class="font-item">Nunito</div>
+          <div class="font-item">Roboto</div>
+          <div class="font-item">Source Sans</div>
+          <div class="font-cat" style="margin-top:8px">Serif</div>
+          <div class="font-item">Playfair Display</div>
+          <div class="font-item">Lora</div>
+          <div class="font-item">Merriweather</div>
+          <div class="font-item">Crimson Text</div>
+          <div class="font-item">Libre Baskerville</div>
+          <div class="font-cat" style="margin-top:8px">Mixed</div>
+          <div class="font-item">Montserrat + Open Sans</div>
+          <div class="font-item">Playfair + Source Sans</div>
+          <div class="font-item">Raleway + Roboto</div>
+        </div>
+
+        <!-- Tab: Lainnya (hidden) -->
+        <div id="tab-lainnya" style="display:none">
+          <div class="section-header" style="margin-bottom:8px">
+            <div class="title" style="font-size:12px;color:#94a3b8;font-weight:600">TEMPLATE</div>
+          </div>
+          <div class="select-wrapper" style="margin-bottom:16px">
+            <select class="select-styled" disabled>
+              <option selected>Creative</option>
+            </select>
+            <div class="select-arrow">▼</div>
+          </div>
+
+          <div class="section-header" style="margin-bottom:8px">
+            <div class="title" style="font-size:12px;color:#94a3b8;font-weight:600">UKURAN PDF</div>
+          </div>
+          <div class="toggle-group" style="margin-bottom:14px">
+            <button class="toggle-btn active">Sesuai Konten</button>
+            <button class="toggle-btn">A4 Penuh</button>
+          </div>
+
+          <div class="section-header" style="margin-bottom:8px">
+            <div class="title" style="font-size:12px;color:#94a3b8;font-weight:600">BAHASA CV</div>
+          </div>
+          <div class="toggle-group">
+            <button class="toggle-btn active">🇮🇩 Indonesia</button>
+            <button class="toggle-btn">🇬🇧 English</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Comparison Table -->
+<div class="comparison-section">
+  <h2>📊 Perbandingan</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Aspek</th>
+        <th>Opsi A (Dropdown) <span class="badge-rec">Recommended</span></th>
+        <th>Opsi B (Accordion)</th>
+        <th>Opsi C (Tabs)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Tinggi sidebar</td>
+        <td>~400px</td>
+        <td>~250–500px</td>
+        <td>~300px</td>
+      </tr>
+      <tr>
+        <td>Kompleksitas kode</td>
+        <td>🟢 Rendah</td>
+        <td>🟡 Sedang</td>
+        <td>🟡 Sedang</td>
+      </tr>
+      <tr>
+        <td>UX intuitif</td>
+        <td>⭐⭐⭐⭐⭐</td>
+        <td>⭐⭐⭐⭐</td>
+        <td>⭐⭐⭐</td>
+      </tr>
+      <tr>
+        <td>Semua opsi visible</td>
+        <td>✅ Ya</td>
+        <td>❌ Tidak</td>
+        <td>❌ Tidak</td>
+      </tr>
+      <tr>
+        <td>Perubahan dari current</td>
+        <td>Minimal</td>
+        <td>Sedang</td>
+        <td>Besar</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function showTab(name) {
+    // Hide all
+    document.getElementById('tab-warna').style.display = 'none';
+    document.getElementById('tab-font').style.display = 'none';
+    document.getElementById('tab-lainnya').style.display = 'none';
+    // Show selected
+    document.getElementById('tab-' + name).style.display = 'block';
+    // Update tab buttons
+    const btns = document.querySelectorAll('.tab-btn');
+    btns.forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

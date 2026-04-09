@@ -1,5 +1,5 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
@@ -7,7 +7,7 @@ import MinimalistTemplate from '../templates/MinimalistTemplate'
 import CreativeTemplate from '../templates/CreativeTemplate'
 import ExecutiveTemplate from '../templates/ExecutiveTemplate'
 import { FONT_OPTIONS, migrateFontId } from '../utils/fonts'
-import { Download, Palette, Type, ArrowLeft, Check, Loader2, FileText, Languages } from 'lucide-react'
+import { Download, Palette, Type, ArrowLeft, Check, Loader2, FileText, Languages, ChevronDown, Layout } from 'lucide-react'
 
 const themeColors = [
   { name: 'Sky Blue', value: '#0ea5e9' },
@@ -18,6 +18,14 @@ const themeColors = [
   { name: 'Violet', value: '#8b5cf6' },
   { name: 'Teal', value: '#14b8a6' },
   { name: 'Slate', value: '#475569' },
+]
+
+const templateOptions = [
+  { id: 'classic', label: 'Classic', icon: '📋' },
+  { id: 'modern', label: 'Modern', icon: '🎯' },
+  { id: 'minimalist', label: 'Minimalist', icon: '✨' },
+  { id: 'creative', label: 'Creative', icon: '🎨' },
+  { id: 'executive', label: 'Executive', icon: '💼' },
 ]
 
 export default function PreviewPage() {
@@ -31,7 +39,25 @@ export default function PreviewPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [contentHeight, setContentHeight] = useState(1123)
   const [pdfSizeMode, setPdfSizeMode] = useState('dynamic') // 'dynamic' | 'a4'
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false)
+  const [templateDropdownOpen, setTemplateDropdownOpen] = useState(false)
+  const fontDropdownRef = useRef(null)
+  const templateDropdownRef = useRef(null)
   const cvData = { personalInfo, summary, experience, education, skills, certifications }
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (fontDropdownRef.current && !fontDropdownRef.current.contains(e.target)) {
+        setFontDropdownOpen(false)
+      }
+      if (templateDropdownRef.current && !templateDropdownRef.current.contains(e.target)) {
+        setTemplateDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Track actual content height for dynamic preview sizing
   useEffect(() => {
@@ -230,76 +256,145 @@ ${fontLinks}
               </div>
             </div>
 
-            {/* Font */}
+            {/* Template — Custom Dropdown (opens downward) */}
+            <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <Layout style={{ width: 16, height: 16, color: '#0ea5e9' }} />
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>Template</span>
+              </div>
+              <div ref={templateDropdownRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => { setTemplateDropdownOpen(!templateDropdownOpen); setFontDropdownOpen(false) }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
+                    background: templateDropdownOpen ? '#dbeafe' : '#eff6ff', color: '#0369a1', fontWeight: 600,
+                    border: templateDropdownOpen ? '1.5px solid #93c5fd' : '1.5px solid #bfdbfe',
+                    fontSize: 14, fontFamily: "'Inter', sans-serif",
+                  }}
+                >
+                  <span>{(templateOptions.find(t => t.id === selectedTemplate) || templateOptions[0]).label}</span>
+                  <ChevronDown style={{
+                    width: 16, height: 16, transition: 'transform 0.2s',
+                    transform: templateDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }} />
+                </button>
+
+                <AnimatePresence>
+                  {templateDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      style={{
+                        position: 'absolute', top: '100%', left: 0, right: 0,
+                        marginTop: 6, background: 'white', borderRadius: 14,
+                        border: '1px solid #e2e8f0', boxShadow: '0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
+                        zIndex: 50, padding: '6px',
+                      }}
+                    >
+                      {templateOptions.map((opt) => {
+                        const isActive = selectedTemplate === opt.id
+                        return (
+                          <button key={opt.id}
+                            onClick={() => { setSelectedTemplate(opt.id); setTemplateDropdownOpen(false) }}
+                            onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = '#f0f9ff' }}
+                            onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
+                            style={{
+                              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                              padding: '9px 10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                              fontSize: 13, transition: 'all 0.15s',
+                              background: isActive ? '#eff6ff' : 'transparent',
+                              color: isActive ? '#0369a1' : '#334155',
+                              fontWeight: isActive ? 600 : 400,
+                            }}
+                          >
+                            <span>{opt.label}</span>
+                            {isActive && <Check style={{ width: 14, height: 14, color: '#0ea5e9', flexShrink: 0 }} />}
+                          </button>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Font — Custom Dropdown (opens downward) */}
             <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                 <Type style={{ width: 16, height: 16, color: '#0ea5e9' }} />
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>Font</span>
               </div>
-              <div style={{ maxHeight: 320, overflowY: 'auto', paddingRight: 4 }}>
-                {['Sans-Serif', 'Serif', 'Mixed'].map((cat) => {
-                  const fonts = FONT_OPTIONS.filter((f) => f.category === cat)
-                  if (fonts.length === 0) return null
-                  return (
-                    <div key={cat} style={{ marginBottom: 12 }}>
-                      <div style={{
-                        fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
-                        color: '#94a3b8', marginBottom: 6, paddingLeft: 4,
-                      }}>{cat}</div>
-                      {fonts.map((opt) => {
-                        const isActive = migrateFontId(fontFamily) === opt.id
-                        return (
-                          <button key={opt.id} onClick={() => setFontFamily(opt.id)}
-                            style={{
-                              width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                              padding: '8px 12px', borderRadius: 10, marginBottom: 4, fontSize: 13, cursor: 'pointer',
-                              fontFamily: opt.preview, transition: 'all 0.2s',
-                              background: isActive ? '#eff6ff' : '#f8fafc',
-                              color: isActive ? '#0369a1' : '#475569',
-                              border: isActive ? '1.5px solid #bfdbfe' : '1.5px solid transparent',
-                              fontWeight: isActive ? 600 : 400,
-                            }}
-                          >
-                            <span>{opt.label}</span>
-                            {isActive && <Check style={{ width: 14, height: 14, flexShrink: 0 }} />}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Template */}
-            <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b', marginBottom: 10, display: 'block' }}>Template</span>
-              <div style={{ position: 'relative' }}>
-                <select
-                  value={selectedTemplate}
-                  onChange={(e) => setSelectedTemplate(e.target.value)}
+              <div ref={fontDropdownRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => { setFontDropdownOpen(!fontDropdownOpen); setTemplateDropdownOpen(false) }}
                   style={{
-                    width: '100%', padding: '10px 36px 10px 14px', borderRadius: 12,
-                    fontSize: 14, cursor: 'pointer', transition: 'all 0.2s',
-                    background: '#eff6ff', color: '#0369a1', fontWeight: 600,
-                    border: '1.5px solid #bfdbfe',
-                    appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
-                    outline: 'none',
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 14px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
+                    background: fontDropdownOpen ? '#dbeafe' : '#eff6ff', color: '#0369a1', fontWeight: 600,
+                    border: fontDropdownOpen ? '1.5px solid #93c5fd' : '1.5px solid #bfdbfe',
+                    fontSize: 14, fontFamily: (FONT_OPTIONS.find(f => f.id === migrateFontId(fontFamily)) || FONT_OPTIONS[0]).preview,
                   }}
                 >
-                  <option value="classic">Classic</option>
-                  <option value="modern">Modern</option>
-                  <option value="minimalist">Minimalist</option>
-                  <option value="creative">Creative</option>
-                  <option value="executive">Executive</option>
-                </select>
-                {/* Custom dropdown arrow */}
-                <div style={{
-                  position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                  pointerEvents: 'none', color: '#0369a1', fontSize: 12,
-                }}>
-                  ▼
-                </div>
+                  <span>{(FONT_OPTIONS.find(f => f.id === migrateFontId(fontFamily)) || FONT_OPTIONS[0]).label}</span>
+                  <ChevronDown style={{
+                    width: 16, height: 16, transition: 'transform 0.2s',
+                    transform: fontDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }} />
+                </button>
+
+                <AnimatePresence>
+                  {fontDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      style={{
+                        position: 'absolute', top: '100%', left: 0, right: 0,
+                        marginTop: 6, background: 'white', borderRadius: 14,
+                        border: '1px solid #e2e8f0', boxShadow: '0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
+                        maxHeight: 320, overflowY: 'auto', zIndex: 50, padding: '6px',
+                      }}
+                    >
+                      {['Sans-Serif', 'Serif', 'Mixed'].map((cat) => {
+                        const fonts = FONT_OPTIONS.filter((f) => f.category === cat)
+                        if (fonts.length === 0) return null
+                        return (
+                          <div key={cat}>
+                            <div style={{
+                              fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
+                              color: '#94a3b8', padding: '8px 10px 4px', userSelect: 'none',
+                            }}>{cat}</div>
+                            {fonts.map((opt) => {
+                              const isActive = migrateFontId(fontFamily) === opt.id
+                              return (
+                                <button key={opt.id}
+                                  onClick={() => { setFontFamily(opt.id); setFontDropdownOpen(false) }}
+                                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = '#f0f9ff' }}
+                                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
+                                  style={{
+                                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    padding: '8px 10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                                    fontSize: 13, fontFamily: opt.preview, transition: 'all 0.15s',
+                                    background: isActive ? '#eff6ff' : 'transparent',
+                                    color: isActive ? '#0369a1' : '#334155',
+                                    fontWeight: isActive ? 600 : 400,
+                                  }}
+                                >
+                                  <span>{opt.label}</span>
+                                  {isActive && <Check style={{ width: 14, height: 14, color: '#0ea5e9', flexShrink: 0 }} />}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
