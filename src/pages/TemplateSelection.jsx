@@ -1,168 +1,286 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
 import { Check, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
-
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { EffectCards } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/effect-cards'
 
 const templates = [
   {
     id: 'classic',
     name: 'Classic',
     desc: 'Desain profesional dengan sidebar gelap dan aksen warna — cocok untuk semua industri.',
-    image: '/Sample 1.webp',
+    image: '/Classic.webp',
   },
   {
     id: 'modern',
     name: 'Modern',
     desc: 'Layout bersih dengan sidebar berwarna dan foto bulat — sempurna untuk industri kreatif.',
-    image: '/sample 2.webp',
+    image: '/Modern.webp',
   },
   {
     id: 'minimalist',
     name: 'Minimalist',
     desc: 'Layout satu kolom ultra-bersih tanpa sidebar — elegan untuk akademisi dan tech professional.',
-    image: '/sample-minimalist.webp',
+    image: '/Minimalist.webp',
   },
   {
     id: 'creative',
     name: 'Creative',
     desc: 'Header bold berwarna penuh dengan 2 kolom — sempurna untuk desainer dan marketer.',
-    image: '/sample-creative.webp',
+    image: '/creative.webp',
   },
   {
     id: 'executive',
     name: 'Executive',
     desc: 'Sidebar kanan premium dengan gaya korporat formal — ideal untuk manajer dan eksekutif.',
-    image: '/sample-executive.webp',
+    image: '/Executive.webp',
   },
 ]
 
 export default function TemplateSelection() {
   const { selectedTemplate, setSelectedTemplate, setCurrentStep, themeColor } = useCVStore()
   const [activeIndex, setActiveIndex] = useState(
-    templates.findIndex(t => t.id === selectedTemplate) || 0
+    Math.max(0, templates.findIndex(t => t.id === selectedTemplate))
   )
-  const swiperRef = useRef(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const containerRef = useRef(null)
+
+  // Touch/drag support
+  const dragStartX = useRef(0)
+  const isDragging = useRef(false)
 
   const activeTemplate = templates[activeIndex]
 
+  const goTo = (index) => {
+    if (isTransitioning || index < 0 || index >= templates.length) return
+    setIsTransitioning(true)
+    setActiveIndex(index)
+    setSelectedTemplate(templates[index].id)
+    setTimeout(() => setIsTransitioning(false), 400)
+  }
+
+  const goNext = () => goTo(activeIndex + 1)
+  const goPrev = () => goTo(activeIndex - 1)
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight') goNext()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [activeIndex, isTransitioning])
+
+  // Touch handlers
+  const handleTouchStart = (e) => {
+    dragStartX.current = e.touches[0].clientX
+    isDragging.current = true
+  }
+  const handleTouchEnd = (e) => {
+    if (!isDragging.current) return
+    const diff = dragStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? goNext() : goPrev()
+    }
+    isDragging.current = false
+  }
+
+  // Mouse drag handlers
+  const handleMouseDown = (e) => {
+    dragStartX.current = e.clientX
+    isDragging.current = true
+  }
+  const handleMouseUp = (e) => {
+    if (!isDragging.current) return
+    const diff = dragStartX.current - e.clientX
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? goNext() : goPrev()
+    }
+    isDragging.current = false
+  }
+
+  // Get the 3 visible cards: prev, active, next
+  const getCardStyle = (index) => {
+    const diff = index - activeIndex
+    const isActive = diff === 0
+    const isPrev = diff === -1
+    const isNext = diff === 1
+
+    if (!isActive && !isPrev && !isNext) {
+      return {
+        opacity: 0,
+        transform: diff < -1 ? 'translateX(-180%) scale(0.7)' : 'translateX(180%) scale(0.7)',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }
+    }
+
+    if (isActive) {
+      return {
+        opacity: 1,
+        transform: 'translateX(0) scale(1)',
+        zIndex: 3,
+        pointerEvents: 'auto',
+      }
+    }
+
+    if (isPrev) {
+      return {
+        opacity: 0.55,
+        transform: 'translateX(-72%) scale(0.78)',
+        zIndex: 2,
+        pointerEvents: 'auto',
+        filter: 'brightness(0.7)',
+      }
+    }
+
+    if (isNext) {
+      return {
+        opacity: 0.55,
+        transform: 'translateX(72%) scale(0.78)',
+        zIndex: 2,
+        pointerEvents: 'auto',
+        filter: 'brightness(0.7)',
+      }
+    }
+  }
+
   return (
     <div style={{ paddingTop: 88, paddingBottom: 40, minHeight: '100vh' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          style={{ textAlign: 'center', marginBottom: 28 }}
+          style={{ textAlign: 'center', marginBottom: 36 }}
         >
           <h1 style={{ fontSize: 32, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
             Pilih Template <span className="gradient-text">CV</span>
           </h1>
           <p style={{ color: '#64748b', fontSize: 15 }}>
-            Geser untuk melihat template — pilih yang paling sesuai
+            Geser atau klik untuk melihat template — pilih yang paling sesuai
           </p>
         </motion.div>
 
-        {/* Swiper Slider */}
+        {/* Carousel Area */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.5 }}
-          style={{ position: 'relative', maxWidth: 400, margin: '0 auto' }}
+          style={{ position: 'relative', maxWidth: 800, margin: '0 auto' }}
         >
           {/* Navigation Arrows */}
-          <button
-            onClick={() => swiperRef.current?.slidePrev()}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={goPrev}
+            disabled={activeIndex === 0}
             aria-label="Template sebelumnya"
             style={{
-              position: 'absolute', left: -56, top: '42%', transform: 'translateY(-50%)',
-              zIndex: 20, width: 42, height: 42, borderRadius: '50%',
-              background: 'white', border: '2px solid #e2e8f0', cursor: 'pointer',
+              position: 'absolute', left: -20, top: '45%', transform: 'translateY(-50%)',
+              zIndex: 20, width: 44, height: 44, borderRadius: '50%',
+              background: activeIndex === 0 ? '#f1f5f9' : 'white',
+              border: 'none', cursor: activeIndex === 0 ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = themeColor
-              e.currentTarget.style.boxShadow = `0 4px 20px ${themeColor}30`
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#e2e8f0'
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'
+              boxShadow: activeIndex === 0 ? 'none' : '0 4px 20px rgba(0,0,0,0.12)',
+              opacity: activeIndex === 0 ? 0.4 : 1,
+              transition: 'all 0.3s',
             }}
           >
-            <ChevronLeft style={{ width: 20, height: 20, color: '#475569' }} />
-          </button>
+            <ChevronLeft style={{ width: 22, height: 22, color: activeIndex === 0 ? '#94a3b8' : '#334155' }} />
+          </motion.button>
 
-          <button
-            onClick={() => swiperRef.current?.slideNext()}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={goNext}
+            disabled={activeIndex === templates.length - 1}
             aria-label="Template berikutnya"
             style={{
-              position: 'absolute', right: -56, top: '42%', transform: 'translateY(-50%)',
-              zIndex: 20, width: 42, height: 42, borderRadius: '50%',
-              background: 'white', border: '2px solid #e2e8f0', cursor: 'pointer',
+              position: 'absolute', right: -20, top: '45%', transform: 'translateY(-50%)',
+              zIndex: 20, width: 44, height: 44, borderRadius: '50%',
+              background: activeIndex === templates.length - 1 ? '#f1f5f9' : 'white',
+              border: 'none', cursor: activeIndex === templates.length - 1 ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = themeColor
-              e.currentTarget.style.boxShadow = `0 4px 20px ${themeColor}30`
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#e2e8f0'
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'
+              boxShadow: activeIndex === templates.length - 1 ? 'none' : '0 4px 20px rgba(0,0,0,0.12)',
+              opacity: activeIndex === templates.length - 1 ? 0.4 : 1,
+              transition: 'all 0.3s',
             }}
           >
-            <ChevronRight style={{ width: 20, height: 20, color: '#475569' }} />
-          </button>
+            <ChevronRight style={{ width: 22, height: 22, color: activeIndex === templates.length - 1 ? '#94a3b8' : '#334155' }} />
+          </motion.button>
 
-          {/* Swiper */}
-          <Swiper
-            modules={[EffectCards]}
-            effect="cards"
-            grabCursor={true}
-            initialSlide={activeIndex}
-            cardsEffect={{
-              perSlideRotate: 3,
-              perSlideOffset: 9,
-              slideShadows: false,
+          {/* Cards Container */}
+          <div
+            ref={containerRef}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            style={{
+              position: 'relative',
+              height: 480,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              cursor: 'grab',
+              userSelect: 'none',
             }}
-            onSwiper={(swiper) => { swiperRef.current = swiper }}
-            onSlideChange={(swiper) => {
-              const idx = swiper.activeIndex
-              setActiveIndex(idx)
-              setSelectedTemplate(templates[idx].id)
-            }}
-            style={{ padding: '8px 0 16px', overflow: 'visible' }}
           >
-            {templates.map((t) => {
+            {templates.map((t, index) => {
+              const cardStyle = getCardStyle(index)
+              const isActive = index === activeIndex
               const isSelected = selectedTemplate === t.id
+
               return (
-                <SwiperSlide key={t.id} style={{ borderRadius: 16, overflow: 'hidden' }}>
+                <motion.div
+                  key={t.id}
+                  onClick={() => {
+                    if (!isActive) goTo(index)
+                  }}
+                  animate={cardStyle}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 350,
+                    damping: 35,
+                    mass: 0.8,
+                  }}
+                  style={{
+                    position: 'absolute',
+                    width: '58%',
+                    maxWidth: 360,
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    cursor: isActive ? 'default' : 'pointer',
+                    willChange: 'transform, opacity',
+                  }}
+                >
                   <div
                     style={{
                       position: 'relative',
                       borderRadius: 16,
                       overflow: 'hidden',
-                      background: '#1e293b',
-                      border: isSelected ? `3px solid ${themeColor}` : '3px solid rgba(255,255,255,0.1)',
-                      transition: 'border-color 0.3s',
+                      background: '#f8fafc',
+                      border: isActive && isSelected
+                        ? `3px solid ${themeColor}`
+                        : '3px solid transparent',
+                      boxShadow: isActive
+                        ? `0 20px 60px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05)`
+                        : '0 8px 24px -8px rgba(0,0,0,0.15)',
+                      transition: 'border-color 0.3s, box-shadow 0.3s',
                     }}
                   >
                     {/* Selected Checkmark */}
-                    {isSelected && (
+                    {isActive && isSelected && (
                       <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                         style={{
-                          position: 'absolute', top: 12, right: 12, width: 32, height: 32,
+                          position: 'absolute', top: 10, right: 10, width: 30, height: 30,
                           borderRadius: '50%', background: themeColor, zIndex: 10,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           boxShadow: `0 4px 14px ${themeColor}55`,
                         }}
                       >
-                        <Check style={{ width: 16, height: 16, color: '#fff' }} />
+                        <Check style={{ width: 15, height: 15, color: '#fff' }} />
                       </motion.div>
                     )}
 
@@ -178,95 +296,115 @@ export default function TemplateSelection() {
                       }}
                     />
 
-                    {/* Gradient Overlay + Info + CTA — fused into the card */}
-                    <div style={{
-                      position: 'absolute',
-                      bottom: 0, left: 0, right: 0,
-                      background: 'linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.85) 40%, rgba(15,23,42,0.4) 75%, transparent 100%)',
-                      padding: '64px 20px 20px',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    }}>
-                      {/* Template Name */}
-                      <h3 style={{
-                        fontSize: 20, fontWeight: 700, color: '#fff',
-                        marginBottom: 6, textAlign: 'center',
-                        textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                    {/* Gradient Overlay (only on active) */}
+                    {isActive && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0, left: 0, right: 0,
+                        background: 'linear-gradient(to top, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.7) 45%, rgba(15,23,42,0.15) 75%, transparent 100%)',
+                        padding: '56px 16px 16px',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
                       }}>
-                        {t.name}
-                      </h3>
-                      {/* Template Description */}
-                      <p style={{
-                        fontSize: 12.5, color: 'rgba(255,255,255,0.75)', lineHeight: 1.5,
-                        textAlign: 'center', maxWidth: 320, marginBottom: 14,
+                        {/* Template Name */}
+                        <h3 style={{
+                          fontSize: 18, fontWeight: 700, color: '#fff',
+                          marginBottom: 4, textAlign: 'center',
+                          textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                        }}>
+                          {t.name}
+                        </h3>
+                        {/* Template Description */}
+                        <p style={{
+                          fontSize: 11.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5,
+                          textAlign: 'center', maxWidth: 280, marginBottom: 12,
+                        }}>
+                          {t.desc}
+                        </p>
+                        {/* CTA Button */}
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedTemplate(t.id)
+                            setCurrentStep(2)
+                          }}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '8px 20px',
+                            borderRadius: 10,
+                            background: themeColor,
+                            color: 'white', fontWeight: 600, fontSize: 12,
+                            border: 'none',
+                            cursor: 'pointer',
+                            boxShadow: `0 6px 20px ${themeColor}44`,
+                            transition: 'all 0.3s',
+                          }}
+                        >
+                          Pilih {t.name}
+                          <ArrowRight style={{ width: 13, height: 13 }} />
+                        </motion.button>
+                      </div>
+                    )}
+
+                    {/* Non-active label at bottom */}
+                    {!isActive && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0, left: 0, right: 0,
+                        background: 'linear-gradient(to top, rgba(15,23,42,0.85) 0%, transparent 100%)',
+                        padding: '28px 12px 10px',
+                        textAlign: 'center',
                       }}>
-                        {t.desc}
-                      </p>
-                      {/* CTA Button inside card */}
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedTemplate(t.id)
-                          setCurrentStep(2)
-                        }}
-                        style={{
-                          display: 'inline-flex', alignItems: 'center', gap: 8,
-                          padding: '10px 24px',
-                          borderRadius: 12,
-                          background: isSelected ? themeColor : 'rgba(255,255,255,0.15)',
-                          backdropFilter: 'blur(8px)',
-                          color: 'white', fontWeight: 600, fontSize: 13,
-                          border: isSelected ? 'none' : '1px solid rgba(255,255,255,0.25)',
-                          cursor: 'pointer',
-                          boxShadow: isSelected ? `0 6px 20px ${themeColor}55` : 'none',
-                          transition: 'all 0.3s',
-                        }}
-                      >
-                        Pilih {t.name}
-                        <ArrowRight style={{ width: 14, height: 14 }} />
-                      </motion.button>
-                    </div>
+                        <p style={{
+                          fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+                          margin: 0,
+                        }}>
+                          {t.name}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                </SwiperSlide>
+                </motion.div>
               )
             })}
-          </Swiper>
+          </div>
         </motion.div>
 
-        {/* Dots + Back — compact below slider */}
-        <div style={{ textAlign: 'center', marginTop: 16 }}>
-          {/* Slide Indicator Dots */}
+        {/* Bottom Controls */}
+        <div style={{ textAlign: 'center', marginTop: 8 }}>
+          {/* Dot Indicators */}
           <div style={{
             display: 'flex', justifyContent: 'center', gap: 8,
-            marginBottom: 16,
+            marginBottom: 14,
           }}>
             {templates.map((t, i) => (
               <button
                 key={t.id}
-                onClick={() => swiperRef.current?.slideTo(i)}
+                onClick={() => goTo(i)}
                 style={{
-                  width: activeIndex === i ? 26 : 9,
-                  height: 9,
-                  borderRadius: 9,
+                  width: activeIndex === i ? 28 : 10,
+                  height: 10,
+                  borderRadius: 10,
                   background: activeIndex === i ? themeColor : '#cbd5e1',
                   border: 'none',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
               />
             ))}
           </div>
 
-          {/* Swipe hint */}
+          {/* Counter */}
           <AnimatePresence mode="wait">
             <motion.p
               key={activeTemplate.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
               style={{
-                fontSize: 13, color: '#94a3b8', marginBottom: 10,
+                fontSize: 13, color: '#94a3b8', marginBottom: 12,
               }}
             >
               {activeIndex + 1} / {templates.length} — <span style={{ color: themeColor, fontWeight: 600 }}>{activeTemplate.name}</span>
@@ -286,13 +424,6 @@ export default function TemplateSelection() {
           </button>
         </div>
       </div>
-
-      {/* Custom Swiper Styles */}
-      <style>{`
-        .swiper-slide {
-          border-radius: 16px !important;
-        }
-      `}</style>
     </div>
   )
 }

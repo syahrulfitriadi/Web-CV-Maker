@@ -91,7 +91,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
         {/* Photo */}
         {personalInfo.photoPreview ? (
           <div style={{
-            width: 100, height: 100, borderRadius: 16, overflow: 'hidden',
+            width: 115, height: 115, borderRadius: '50%', overflow: 'hidden',
             flexShrink: 0, border: '3px solid rgba(255,255,255,0.3)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
             position: 'relative', zIndex: 1,
@@ -102,7 +102,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           </div>
         ) : (
           <div style={{
-            width: 100, height: 100, borderRadius: 16,
+            width: 115, height: 115, borderRadius: '50%',
             border: '3px solid rgba(255,255,255,0.3)',
             background: 'rgba(255,255,255,0.1)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -139,12 +139,11 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
               {contactItems.map((item, i) => (
                 <span key={i} style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
-                  color: 'rgba(255,255,255,0.8)',
-                  background: 'rgba(255,255,255,0.12)',
+                  color: 'rgba(255,255,255,0.9)', fontWeight: 600,
+                  background: 'rgba(255,255,255,0.18)',
                   padding: '2px 8px', borderRadius: 6,
-                  backdropFilter: 'blur(4px)',
                 }}>
-                  <span style={{ fontSize: 8, opacity: 0.7 }}>{item.icon}</span>
+                  <span style={{ fontSize: 10, opacity: 0.8 }}>{item.icon}</span>
                   {item.val}
                 </span>
               ))}

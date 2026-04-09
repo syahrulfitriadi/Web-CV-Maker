@@ -45,13 +45,13 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
       {/* ═══════ HEADER BAND ═══════ */}
       <header style={{
         background: '#fafafa',
-        padding: '30px 42px 24px',
+        padding: '34px 42px 28px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         gap: 24, flexShrink: 0,
         borderBottom: `2px solid ${tc}`,
       }}>
         {/* Left: Photo + Name + Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 22, flex: 1 }}>
           {hasPhoto && (
             <div style={{
               width: 100, height: 100, borderRadius: '50%', overflow: 'hidden',
@@ -65,14 +65,14 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
           )}
           <div>
             <h1 style={{
-              fontSize: 28, fontWeight: 800, margin: '0 0 4px',
+              fontSize: 30, fontWeight: 800, margin: '0 0 6px',
               color: '#111', fontFamily: hf,
               letterSpacing: '-0.02em', lineHeight: 1.1,
             }}>
               {personalInfo.name || t.yourName}
             </h1>
             <p style={{
-              fontSize: 10, fontWeight: 500, margin: 0, color: tc,
+              fontSize: 11, fontWeight: 500, margin: 0, color: tc,
               letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: ff,
             }}>
               {personalInfo.title || t.jobTitle}
@@ -83,20 +83,20 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
         {/* Right: Contact info stacked */}
         {contactItems.length > 0 && (
           <div style={{
-            display: 'flex', flexDirection: 'column', gap: 5,
+            display: 'flex', flexDirection: 'column', gap: 6,
             alignItems: 'flex-end', flexShrink: 0,
           }}>
             {contactItems.map((item, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: 7,
-                fontSize: '7.5pt', color: '#6b7280',
+                fontSize: '8pt', color: '#6b7280',
               }}>
                 <span style={{ wordBreak: 'break-word', lineHeight: 1.3 }}>{item.val}</span>
                 <span style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 14,
                 }}>
-                  <item.icon color={tc} size={10} />
+                  <item.icon color={tc} size={11} />
                 </span>
               </div>
             ))}
@@ -104,30 +104,47 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
         )}
       </header>
 
+      {/* ═══════ SUMMARY BAND (Full-Width) ═══════ */}
+      {summary && (
+        <section style={{
+          padding: '18px 42px',
+          borderBottom: '1px solid #e5e7eb',
+          flexShrink: 0, background: '#fff',
+        }}>
+          <SectionTitle text={t.profileSummary} color={tc} font={hf} />
+          <p style={{
+            fontSize: '9pt', lineHeight: 1.8, margin: 0, color: '#374151',
+            textAlign: 'justify',
+          }}>
+            {summary}
+          </p>
+        </section>
+      )}
+
       {/* ═══════ BODY: TWO COLUMNS ═══════ */}
       <div style={{
-        display: 'flex', flex: 1, padding: '26px 42px', gap: 36, overflow: 'hidden'
+        display: 'flex', flex: 1, padding: '22px 42px', gap: 36, overflow: 'hidden'
       }}>
 
         {/* LEFT COLUMN (38%): Education, Skills, Certifications */}
         <div style={{
-          width: '38%', display: 'flex', flexDirection: 'column', gap: 24, overflow: 'hidden'
+          width: '38%', display: 'flex', flexDirection: 'column', gap: 22, overflow: 'hidden'
         }}>
 
           {/* EDUCATION */}
           {education.some(e => e.institution) && (
             <section>
               <SectionTitle text={t.education} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {education.filter(e => e.institution).map((edu, i) => (
                   <div key={i}>
-                    <h3 style={{ fontSize: '8.5pt', fontWeight: 700, margin: '0 0 2px', color: '#111' }}>
+                    <h3 style={{ fontSize: '9.5pt', fontWeight: 700, margin: '0 0 3px', color: '#111' }}>
                       {edu.institution}
                     </h3>
-                    <p style={{ fontSize: '7.5pt', margin: '0 0 2px', color: '#4b5563' }}>
+                    <p style={{ fontSize: '8.5pt', margin: '0 0 2px', color: '#4b5563' }}>
                       {edu.degree}{edu.field ? `${t.degreeOf}${edu.field}` : ''}
                     </p>
-                    <p style={{ fontSize: '7pt', margin: 0, color: '#9ca3af' }}>
+                    <p style={{ fontSize: '8pt', margin: 0, color: '#9ca3af' }}>
                       {edu.startDate && `${edu.startDate} – `}{edu.endDate || t.present}
                       {edu.gpa ? ` • ${t.gpaLabel} ${edu.gpa}` : ''}
                     </p>
@@ -141,11 +158,11 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
           {skills.hard.some(s => s) && (
             <section>
               <SectionTitle text={t.hardSkill || t.skills} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {skills.hard.filter(s => s).map((s, i) => (
                   <div key={i} style={{
-                    display: 'flex', alignItems: 'center', gap: 7,
-                    fontSize: '7.5pt', color: '#4b5563',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    fontSize: '8.5pt', color: '#4b5563',
                   }}>
                     <span style={{
                       width: 5, height: 5, borderRadius: '50%',
@@ -162,12 +179,12 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
           {skills.soft.some(s => s) && (
             <section>
               <SectionTitle text={t.softSkill || 'Soft Skills'} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {skills.soft.filter(s => s).map((s, i) => (
                   <span key={i} style={{
-                    display: 'inline-block', padding: '2px 9px',
+                    display: 'inline-block', padding: '3px 10px',
                     border: `1px solid ${hexToRgba(tc, 0.3)}`,
-                    borderRadius: 12, fontSize: '7pt', color: '#4b5563',
+                    borderRadius: 12, fontSize: '8pt', color: '#4b5563',
                     lineHeight: 1.4,
                   }}>
                     {s}
@@ -181,17 +198,17 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
           {certifications.some(c => c) && (
             <section>
               <SectionTitle text={t.certifications} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {certifications.filter(c => c).map((c, i) => (
                   <div key={i} style={{
-                    display: 'flex', alignItems: 'flex-start', gap: 7,
-                    fontSize: '7.5pt', color: '#4b5563', lineHeight: 1.4,
+                    display: 'flex', alignItems: 'flex-start', gap: 8,
+                    fontSize: '8.5pt', color: '#4b5563', lineHeight: 1.5,
                   }}>
                     <span style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      width: 12, flexShrink: 0, paddingTop: 1,
+                      width: 13, flexShrink: 0, paddingTop: 1,
                     }}>
-                      <CheckSvg color={tc} size={10} />
+                      <CheckSvg color={tc} size={11} />
                     </span>
                     <span>{c}</span>
                   </div>
@@ -201,47 +218,33 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
           )}
         </div>
 
-        {/* RIGHT COLUMN (62%): Summary, Experience */}
+        {/* RIGHT COLUMN (62%): Experience */}
         <div style={{
-          width: '62%', display: 'flex', flexDirection: 'column', gap: 24, overflow: 'hidden'
+          width: '62%', display: 'flex', flexDirection: 'column', gap: 22, overflow: 'hidden'
         }}>
-
-          {/* PROFILE SUMMARY */}
-          {summary && (
-            <section>
-              <SectionTitle text={t.profileSummary} color={tc} font={hf} />
-              <p style={{
-                fontSize: '8pt', lineHeight: 1.7, margin: 0, color: '#374151',
-                textAlign: 'justify',
-                paddingLeft: 12, borderLeft: `2.5px solid ${hexToRgba(tc, 0.35)}`,
-              }}>
-                {summary}
-              </p>
-            </section>
-          )}
 
           {/* WORK EXPERIENCE */}
           {experience.some(e => e.company || e.role) && (
             <section>
               <SectionTitle text={t.workExperience} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 {experience.filter(e => e.company || e.role).map((exp, i) => (
                   <div key={i}>
                     <div style={{
                       display: 'flex', justifyContent: 'space-between',
-                      alignItems: 'baseline', marginBottom: 2,
+                      alignItems: 'baseline', marginBottom: 3,
                     }}>
-                      <h3 style={{ fontSize: '9.5pt', fontWeight: 700, margin: 0, color: '#111' }}>
+                      <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: 0, color: '#111' }}>
                         {exp.role}
                       </h3>
                       <span style={{
-                        fontSize: '7.5pt', color: tc, flexShrink: 0, fontWeight: 500,
+                        fontSize: '8pt', color: tc, flexShrink: 0, fontWeight: 500,
                       }}>
                         {exp.startDate && `${exp.startDate} – `}{exp.current ? t.present : exp.endDate || ''}
                       </span>
                     </div>
 
-                    <p style={{ fontSize: '7.5pt', margin: '0 0 6px', color: '#9ca3af' }}>
+                    <p style={{ fontSize: '8.5pt', margin: '0 0 8px', color: '#9ca3af' }}>
                       <span style={{ fontWeight: 500, color: '#6b7280' }}>{exp.company}</span>
                       {exp.location ? ` • ${exp.location}` : ''}
                       {exp.type ? ` • ${exp.type}` : ''}
@@ -250,8 +253,8 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
                     {exp.bullets?.filter(b => b).length > 0 && (
                       <ul style={{
                         listStyle: 'none', margin: 0, padding: 0,
-                        color: '#374151', fontSize: '7.5pt', lineHeight: 1.6,
-                        display: 'flex', flexDirection: 'column', gap: 3,
+                        color: '#374151', fontSize: '8.5pt', lineHeight: 1.7,
+                        display: 'flex', flexDirection: 'column', gap: 4,
                       }}>
                         {exp.bullets.filter(b => b).map((b, j) => (
                           <li key={j} style={{
@@ -281,10 +284,10 @@ export default function MinimalistTemplate({ data, themeColor = '#111827', fontF
 function SectionTitle({ text, color, font }) {
   return (
     <h2 style={{
-      fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
+      fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
       letterSpacing: '0.14em', color: color,
-      margin: '0 0 10px', fontFamily: font,
-      paddingBottom: 6,
+      margin: '0 0 12px', fontFamily: font,
+      paddingBottom: 7,
       borderBottom: `1px solid #e5e7eb`,
     }}>
       {text}
