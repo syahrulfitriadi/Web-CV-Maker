@@ -33,7 +33,7 @@ const translations = {
     jobTitleModern: 'Posisi / Jabatan',
     present: 'Sekarang',
     gpaLabel: 'IPK',
-    degreeOf: '',       // in Indonesian, no "of" between degree and field
+    degreeOf: ' ',      // in Indonesian, just a space between degree and field
 
     // UI (PDF export, preview page)
     popupBlocked: 'Popup diblokir oleh browser. Izinkan popup untuk situs ini, lalu coba lagi.',
