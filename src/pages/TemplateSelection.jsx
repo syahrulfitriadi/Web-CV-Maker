@@ -72,18 +72,22 @@ export default function TemplateSelection() {
 
                 {/* CV Preview Image — actual reference image */}
                 <div style={{
-                  width: '100%', aspectRatio: '210/297', overflow: 'hidden',
-                  background: '#f8fafc',
+                  width: '100%', height: 480, overflow: 'hidden',
+                  background: '#f1f5f9',
+                  padding: 12,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <img
                     src={t.image}
                     alt={`Template ${t.name}`}
                     style={{
-                      width: '100%', height: '100%', objectFit: 'cover',
-                      objectPosition: 'top', display: 'block',
+                      width: '100%', height: '100%', objectFit: 'contain',
+                      objectPosition: 'center', display: 'block',
                       transition: 'transform 0.4s ease',
+                      borderRadius: 8,
+                      boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
                     }}
-                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.03)'}
+                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'}
                     onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                   />
                 </div>
