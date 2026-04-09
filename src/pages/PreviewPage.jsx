@@ -3,6 +3,9 @@ import { motion } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
+import MinimalistTemplate from '../templates/MinimalistTemplate'
+import CreativeTemplate from '../templates/CreativeTemplate'
+import ExecutiveTemplate from '../templates/ExecutiveTemplate'
 import { FONT_OPTIONS, migrateFontId } from '../utils/fonts'
 import { Download, Palette, Type, ArrowLeft, Check, Loader2, FileText, Languages } from 'lucide-react'
 
@@ -157,7 +160,14 @@ ${fontLinks}
     }
   }, [personalInfo.name, isExporting, pdfSizeMode, contentHeight, cvLanguage])
 
-  const TemplateComponent = selectedTemplate === 'classic' ? ClassicTemplate : ModernTemplate
+  const templateMap = {
+    classic: ClassicTemplate,
+    modern: ModernTemplate,
+    minimalist: MinimalistTemplate,
+    creative: CreativeTemplate,
+    executive: ExecutiveTemplate,
+  }
+  const TemplateComponent = templateMap[selectedTemplate] || ClassicTemplate
 
   return (
     <div style={{ paddingTop: 80, paddingBottom: 40, minHeight: '100vh', background: '#eef2f7' }}>
@@ -264,89 +274,88 @@ ${fontLinks}
             {/* Template */}
             <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b', marginBottom: 10, display: 'block' }}>Template</span>
-              {['classic', 'modern'].map((t) => (
-                <button key={t} onClick={() => setSelectedTemplate(t)}
+              <div style={{ position: 'relative' }}>
+                <select
+                  value={selectedTemplate}
+                  onChange={(e) => setSelectedTemplate(e.target.value)}
                   style={{
-                    width: '100%', padding: '10px 14px', borderRadius: 12, marginBottom: 6,
-                    fontSize: 14, cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s',
-                    background: selectedTemplate === t ? '#eff6ff' : '#f8fafc',
-                    color: selectedTemplate === t ? '#0369a1' : '#475569',
-                    border: selectedTemplate === t ? '1.5px solid #bfdbfe' : '1.5px solid #e2e8f0',
-                    fontWeight: selectedTemplate === t ? 600 : 400,
+                    width: '100%', padding: '10px 36px 10px 14px', borderRadius: 12,
+                    fontSize: 14, cursor: 'pointer', transition: 'all 0.2s',
+                    background: '#eff6ff', color: '#0369a1', fontWeight: 600,
+                    border: '1.5px solid #bfdbfe',
+                    appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
+                    outline: 'none',
                   }}
                 >
-                  {t === 'classic' ? 'Classic' : 'Modern'}
-                </button>
-              ))}
+                  <option value="classic">Classic</option>
+                  <option value="modern">Modern</option>
+                  <option value="minimalist">Minimalist</option>
+                  <option value="creative">Creative</option>
+                  <option value="executive">Executive</option>
+                </select>
+                {/* Custom dropdown arrow */}
+                <div style={{
+                  position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                  pointerEvents: 'none', color: '#0369a1', fontSize: 12,
+                }}>
+                  ▼
+                </div>
+              </div>
             </div>
 
-            {/* PDF Size Mode */}
+            {/* PDF Size & Language */}
             <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              {/* PDF Size */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <FileText style={{ width: 16, height: 16, color: '#0ea5e9' }} />
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>Ukuran PDF</span>
               </div>
-              {[
-                { id: 'dynamic', label: 'Sesuai Konten', desc: 'PDF mengikuti panjang isi CV' },
-                { id: 'a4', label: 'A4 Penuh', desc: 'Selalu 210 × 297 mm standar' },
-              ].map((mode) => {
-                const isActive = pdfSizeMode === mode.id
-                return (
-                  <button key={mode.id} onClick={() => setPdfSizeMode(mode.id)}
-                    style={{
-                      width: '100%', padding: '10px 14px', borderRadius: 12, marginBottom: 6,
-                      cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s',
-                      background: isActive ? '#eff6ff' : '#f8fafc',
-                      border: isActive ? '1.5px solid #bfdbfe' : '1.5px solid #e2e8f0',
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: isActive ? 600 : 400, color: isActive ? '#0369a1' : '#475569' }}>
-                        {mode.label}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{mode.desc}</div>
-                    </div>
-                    {isActive && <Check style={{ width: 14, height: 14, color: '#0369a1', flexShrink: 0 }} />}
-                  </button>
-                )
-              })}
-            </div>
+              <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #e2e8f0', marginBottom: 18 }}>
+                {[
+                  { id: 'dynamic', label: 'Sesuai Konten' },
+                  { id: 'a4', label: 'A4 Penuh' },
+                ].map((mode) => {
+                  const isActive = pdfSizeMode === mode.id
+                  return (
+                    <button key={mode.id} onClick={() => setPdfSizeMode(mode.id)}
+                      style={{
+                        flex: 1, padding: '8px 0', fontSize: 13, cursor: 'pointer',
+                        border: 'none', transition: 'all 0.2s', fontWeight: isActive ? 600 : 400,
+                        background: isActive ? '#0ea5e9' : '#f8fafc',
+                        color: isActive ? 'white' : '#64748b',
+                      }}
+                    >
+                      {mode.label}
+                    </button>
+                  )
+                })}
+              </div>
 
-            {/* Language */}
-            <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              {/* Language */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <Languages style={{ width: 16, height: 16, color: '#0ea5e9' }} />
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>Bahasa CV</span>
               </div>
-              {[
-                { id: 'id', label: 'Indonesia', flag: '🇮🇩', desc: 'Label CV dalam Bahasa Indonesia' },
-                { id: 'en', label: 'English', flag: '🇬🇧', desc: 'CV labels in English' },
-              ].map((opt) => {
-                const isActive = cvLanguage === opt.id
-                return (
-                  <button key={opt.id} onClick={() => setCvLanguage(opt.id)}
-                    style={{
-                      width: '100%', padding: '10px 14px', borderRadius: 12, marginBottom: 6,
-                      cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s',
-                      background: isActive ? '#eff6ff' : '#f8fafc',
-                      border: isActive ? '1.5px solid #bfdbfe' : '1.5px solid #e2e8f0',
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: 20 }}>{opt.flag}</span>
-                      <div>
-                        <div style={{ fontSize: 14, fontWeight: isActive ? 600 : 400, color: isActive ? '#0369a1' : '#475569' }}>
-                          {opt.label}
-                        </div>
-                        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>{opt.desc}</div>
-                      </div>
-                    </div>
-                    {isActive && <Check style={{ width: 14, height: 14, color: '#0369a1', flexShrink: 0 }} />}
-                  </button>
-                )
-              })}
+              <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #e2e8f0' }}>
+                {[
+                  { id: 'id', label: '🇮🇩 Indonesia' },
+                  { id: 'en', label: '🇬🇧 English' },
+                ].map((opt) => {
+                  const isActive = cvLanguage === opt.id
+                  return (
+                    <button key={opt.id} onClick={() => setCvLanguage(opt.id)}
+                      style={{
+                        flex: 1, padding: '8px 0', fontSize: 13, cursor: 'pointer',
+                        border: 'none', transition: 'all 0.2s', fontWeight: isActive ? 600 : 400,
+                        background: isActive ? '#0ea5e9' : '#f8fafc',
+                        color: isActive ? 'white' : '#64748b',
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           </div>
 

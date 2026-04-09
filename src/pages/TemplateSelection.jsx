@@ -12,7 +12,7 @@ const templates = [
   {
     id: 'classic',
     name: 'Classic',
-    desc: 'Desain profesional dengan sidebar putih dan aksen warna — cocok untuk semua industri.',
+    desc: 'Desain profesional dengan sidebar gelap dan aksen warna — cocok untuk semua industri.',
     image: '/Sample 1.webp',
   },
   {
@@ -20,6 +20,24 @@ const templates = [
     name: 'Modern',
     desc: 'Layout bersih dengan sidebar berwarna dan foto bulat — sempurna untuk industri kreatif.',
     image: '/sample 2.webp',
+  },
+  {
+    id: 'minimalist',
+    name: 'Minimalist',
+    desc: 'Layout satu kolom ultra-bersih tanpa sidebar — elegan untuk akademisi dan tech professional.',
+    image: '/sample-minimalist.webp',
+  },
+  {
+    id: 'creative',
+    name: 'Creative',
+    desc: 'Header bold berwarna penuh dengan 2 kolom — sempurna untuk desainer dan marketer.',
+    image: '/sample-creative.webp',
+  },
+  {
+    id: 'executive',
+    name: 'Executive',
+    desc: 'Sidebar kanan premium dengan gaya korporat formal — ideal untuk manajer dan eksekutif.',
+    image: '/sample-executive.webp',
   },
 ]
 

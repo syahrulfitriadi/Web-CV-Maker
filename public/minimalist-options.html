@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 Opsi Desain CV Minimalist</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: 'Inter', sans-serif; 
+    background: #0f0f13; 
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+  
+  .hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(180deg, #1a1a24 0%, #0f0f13 100%);
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    color: #9ca3af;
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .options-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 40px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+  }
+
+  .option-card {
+    display: grid;
+    grid-template-columns: 595px 1fr;
+    gap: 48px;
+    align-items: start;
+    background: #16161e;
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid #2a2a3a;
+    transition: border-color 0.3s;
+  }
+  .option-card:hover {
+    border-color: #4a4a6a;
+  }
+
+  .cv-preview {
+    width: 595px;
+    height: 842px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+    background: white;
+  }
+
+  .option-info {
+    padding-top: 10px;
+  }
+  .option-number {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #6366f1;
+    margin-bottom: 8px;
+  }
+  .option-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 16px;
+  }
+  .option-philosophy {
+    font-size: 15px;
+    color: #9ca3af;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    font-style: italic;
+    padding-left: 16px;
+    border-left: 3px solid #6366f1;
+  }
+
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+  .spec-table tr {
+    border-bottom: 1px solid #2a2a3a;
+  }
+  .spec-table td {
+    padding: 10px 0;
+    font-size: 13px;
+    vertical-align: top;
+  }
+  .spec-table td:first-child {
+    font-weight: 600;
+    color: #a78bfa;
+    width: 120px;
+    white-space: nowrap;
+  }
+  .spec-table td:last-child {
+    color: #d1d5db;
+  }
+
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .pros, .cons {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .pros {
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    color: #6ee7b7;
+  }
+  .cons {
+    background: rgba(251, 146, 60, 0.08);
+    border: 1px solid rgba(251, 146, 60, 0.2);
+    color: #fdba74;
+  }
+  .pros strong, .cons strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ========== CV DESIGNS ========== */
+
+  /* --- OPTION 1: Swiss Grid --- */
+  .cv-swiss {
+    padding: 48px 50px;
+    font-family: 'Inter', sans-serif;
+    color: #1a1a1a;
+  }
+  .cv-swiss .header-name {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .cv-swiss .header-title {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #0d7377;
+    margin-bottom: 16px;
+  }
+  .cv-swiss .contact-row {
+    display: flex;
+    gap: 20px;
+    font-size: 8.5px;
+    color: #6b7280;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .cv-swiss .contact-row span { display: flex; align-items: center; gap: 5px; }
+  .cv-swiss .divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin-bottom: 28px;
+  }
+  .cv-swiss .section { margin-bottom: 24px; }
+  .cv-swiss .section-title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #0d7377;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cv-swiss .section-title::before {
+    content: '';
+    width: 12px;
+    height: 1.5px;
+    background: #0d7377;
+    display: inline-block;
+  }
+  .cv-swiss .summary-text {
+    font-size: 9px;
+    line-height: 1.75;
+    color: #374151;
+    text-align: justify;
+  }
+  .cv-swiss .exp-entry { margin-bottom: 16px; }
+  .cv-swiss .exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2px;
+  }
+  .cv-swiss .exp-role { font-size: 11px; font-weight: 700; color: #111; }
+  .cv-swiss .exp-date { font-size: 8px; color: #0d7377; font-weight: 500; }
+  .cv-swiss .exp-company { font-size: 8.5px; color: #6b7280; margin-bottom: 6px; }
+  .cv-swiss .exp-bullets { 
+    list-style: none; padding: 0; font-size: 8.5px; color: #4b5563; line-height: 1.6;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .cv-swiss .exp-bullets li::before { content: '— '; color: #0d7377; }
+  .cv-swiss .edu-entry { margin-bottom: 8px; }
+  .cv-swiss .edu-inst { font-size: 9.5px; font-weight: 600; color: #111; }
+  .cv-swiss .edu-detail { font-size: 8px; color: #6b7280; }
+  .cv-swiss .skills-list {
+    font-size: 8.5px;
+    color: #4b5563;
+    line-height: 1.8;
+  }
+
+  /* --- OPTION 2: Asymmetric Split --- */
+  .cv-asymmetric {
+    font-family: 'Inter', sans-serif;
+    color: #2d2d2d;
+    display: flex;
+    height: 100%;
+  }
+  .cv-asym-left {
+    width: 30%;
+    padding: 40px 24px 40px 32px;
+    border-right: 1px solid #e8e0db;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .cv-asym-right {
+    width: 70%;
+    padding: 40px 36px 40px 30px;
+  }
+  .cv-asym-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #f5eeea;
+    margin: 0 auto 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c45c3c;
+    font-size: 28px;
+    border: 2px solid #e8ddd7;
+  }
+  .cv-asym-section-title {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #c45c3c;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cv-asym-section-title::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: #c45c3c;
+    display: inline-block;
+  }
+  .cv-asym-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 7.5px;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+  .cv-asym-contact-icon {
+    color: #c45c3c;
+    font-size: 9px;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .cv-asym-right .name {
+    font-family: 'Source Serif 4', serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .cv-asym-right .title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #c45c3c;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .cv-asym-right .accent-line {
+    height: 1.5px;
+    background: #c45c3c;
+    width: 60px;
+    margin-bottom: 24px;
+  }
+  .cv-asym-right-section { margin-bottom: 22px; }
+  .cv-asym-right-title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #c45c3c;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cv-asym-right-title::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: #c45c3c;
+    display: inline-block;
+  }
+  .cv-asym-summary {
+    font-size: 8.5px;
+    line-height: 1.7;
+    color: #4b5563;
+    text-align: justify;
+  }
+  .cv-asym-exp { margin-bottom: 14px; }
+  .cv-asym-exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .cv-asym-exp-role { font-size: 10px; font-weight: 700; color: #1a1a1a; }
+  .cv-asym-exp-date { font-size: 7.5px; color: #c45c3c; font-weight: 500; }
+  .cv-asym-exp-company { font-size: 8px; color: #888; margin: 2px 0 5px; }
+  .cv-asym-exp-bullets {
+    list-style: none; padding: 0;
+    font-size: 8px; color: #4b5563; line-height: 1.6;
+  }
+  .cv-asym-exp-bullets li::before { content: '— '; color: #c45c3c; }
+  .cv-asym-edu { margin-bottom: 10px; }
+  .cv-asym-edu-inst { font-size: 8.5px; font-weight: 600; }
+  .cv-asym-edu-detail { font-size: 7.5px; color: #888; }
+  .cv-asym-skill-dot {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 7.5px; color: #4b5563; margin-bottom: 4px;
+  }
+  .cv-asym-skill-dot::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #c45c3c;
+  }
+  .cv-asym-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 7px;
+    color: #6b7280;
+    margin: 2px 3px 2px 0;
+  }
+
+  /* --- OPTION 3: Baseline --- */
+  .cv-baseline {
+    font-family: 'Inter', sans-serif;
+    color: #111;
+    padding: 44px 50px;
+  }
+  .cv-baseline .header-name {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .cv-baseline .header-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #1e3a5f;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .cv-baseline .contact-bar {
+    font-size: 8px;
+    color: #6b7280;
+    margin-bottom: 16px;
+  }
+  .cv-baseline .contact-bar span { margin: 0 6px; color: #d1d5db; }
+  .cv-baseline .thick-line {
+    height: 3px;
+    background: #1e3a5f;
+    margin-bottom: 28px;
+  }
+  .cv-baseline .section { margin-bottom: 26px; }
+  .cv-baseline .section-title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #111;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    border-top: 1.5px solid #1e3a5f;
+  }
+  .cv-baseline .summary-text {
+    font-size: 9px;
+    line-height: 1.75;
+    color: #374151;
+  }
+  .cv-baseline .exp-entry { margin-bottom: 16px; }
+  .cv-baseline .exp-role { font-size: 10.5px; font-weight: 700; color: #111; margin-bottom: 2px; }
+  .cv-baseline .exp-meta { font-size: 8px; color: #9ca3af; margin-bottom: 6px; }
+  .cv-baseline .exp-bullets {
+    list-style: none; padding: 0;
+    font-size: 8.5px; color: #4b5563; line-height: 1.65;
+  }
+  .cv-baseline .exp-bullets li { padding-left: 12px; position: relative; margin-bottom: 2px; }
+  .cv-baseline .exp-bullets li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: #1e3a5f;
+  }
+  .cv-baseline .edu-inline {
+    font-size: 9px;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  .cv-baseline .edu-inline strong { color: #111; }
+  .cv-baseline .edu-inline .date { color: #9ca3af; font-size: 8px; }
+  .cv-baseline .skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .cv-baseline .skill-tag {
+    padding: 3px 10px;
+    background: #f3f4f6;
+    font-size: 7.5px;
+    color: #374151;
+    border-radius: 3px;
+  }
+
+  /* --- OPTION 4: Monochrome Sidebar --- */
+  .cv-monosidebar {
+    font-family: 'Inter', sans-serif;
+    color: #1a1a1a;
+    display: flex;
+    height: 100%;
+  }
+  .cv-mono-left {
+    width: 35%;
+    background: #f7f6f4;
+    padding: 36px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .cv-mono-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #eae8e4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #5a6e47;
+    border: 2px solid #ddd9d3;
+  }
+  .cv-mono-name {
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .cv-mono-title {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #5a6e47;
+    text-align: center;
+    margin-top: -12px;
+  }
+  .cv-mono-divider {
+    width: 40px;
+    height: 1px;
+    background: #d1ccc5;
+    margin: -8px 0;
+  }
+  .cv-mono-section { width: 100%; }
+  .cv-mono-section-title {
+    font-size: 7.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #5a6e47;
+    margin-bottom: 10px;
+  }
+  .cv-mono-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 7.5px;
+    color: #6b7280;
+    margin-bottom: 6px;
+  }
+  .cv-mono-contact-icon {
+    color: #5a6e47;
+    font-size: 9px;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .cv-mono-edu { margin-bottom: 10px; }
+  .cv-mono-edu-inst { font-size: 8.5px; font-weight: 600; color: #111; }
+  .cv-mono-edu-detail { font-size: 7.5px; color: #888; }
+  .cv-mono-skill-bar {
+    margin-bottom: 8px;
+  }
+  .cv-mono-skill-name { font-size: 7.5px; font-weight: 500; color: #444; margin-bottom: 3px; }
+  .cv-mono-bar-bg {
+    height: 4px;
+    background: #ddd9d3;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .cv-mono-bar-fill {
+    height: 100%;
+    background: #5a6e47;
+    border-radius: 2px;
+  }
+  .cv-mono-right {
+    width: 65%;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .cv-mono-right-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #111;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #5a6e47;
+    margin-bottom: 10px;
+  }
+  .cv-mono-summary {
+    font-size: 8.5px;
+    line-height: 1.7;
+    color: #4b5563;
+    text-align: justify;
+  }
+  .cv-mono-timeline { position: relative; padding-left: 18px; }
+  .cv-mono-timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 6px;
+    bottom: 6px;
+    width: 1.5px;
+    background: #d1ccc5;
+  }
+  .cv-mono-tl-entry { position: relative; margin-bottom: 16px; }
+  .cv-mono-tl-entry::before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    top: 5px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #5a6e47;
+    border: 2px solid #f7f6f4;
+  }
+  .cv-mono-tl-role { font-size: 10px; font-weight: 700; color: #111; }
+  .cv-mono-tl-company { font-size: 8px; color: #888; margin: 2px 0 4px; }
+  .cv-mono-tl-date { font-size: 7px; color: #5a6e47; font-weight: 500; }
+  .cv-mono-tl-bullets {
+    list-style: none; padding: 0; margin-top: 5px;
+    font-size: 8px; color: #4b5563; line-height: 1.6;
+  }
+  .cv-mono-tl-bullets li { padding-left: 10px; position: relative; margin-bottom: 2px; }
+  .cv-mono-tl-bullets li::before {
+    content: '›';
+    position: absolute; left: 0; color: #5a6e47; font-weight: bold;
+  }
+
+  /* --- OPTION 5: Horizontal Bands --- */
+  .cv-bands {
+    font-family: 'Inter', sans-serif;
+    color: #1c1c1c;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .cv-bands-header {
+    background: #fafafa;
+    padding: 32px 40px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #4a5c8a;
+  }
+  .cv-bands-header-left {}
+  .cv-bands-name {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .cv-bands-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #4a5c8a;
+    font-weight: 500;
+  }
+  .cv-bands-contact {
+    text-align: right;
+    font-size: 8px;
+    color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cv-bands-contact-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .cv-bands-contact-icon { color: #4a5c8a; font-size: 9px; }
+  .cv-bands-body {
+    display: flex;
+    flex: 1;
+    padding: 28px 40px;
+    gap: 36px;
+  }
+  .cv-bands-left {
+    width: 38%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .cv-bands-right {
+    width: 62%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .cv-bands-section-title {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #4a5c8a;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .cv-bands-summary {
+    font-size: 8.5px;
+    line-height: 1.7;
+    color: #4b5563;
+    padding-left: 12px;
+    border-left: 2.5px solid #4a5c8a;
+    text-align: justify;
+  }
+  .cv-bands-exp { margin-bottom: 14px; }
+  .cv-bands-exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .cv-bands-exp-role { font-size: 10px; font-weight: 700; color: #111; }
+  .cv-bands-exp-date { font-size: 7.5px; color: #4a5c8a; font-weight: 500; }
+  .cv-bands-exp-company { font-size: 8px; color: #888; margin: 2px 0 5px; }
+  .cv-bands-exp-bullets {
+    list-style: none; padding: 0;
+    font-size: 8px; color: #4b5563; line-height: 1.6;
+  }
+  .cv-bands-exp-bullets li { padding-left: 14px; position: relative; margin-bottom: 2px; }
+  .cv-bands-exp-bullets li::before {
+    content: '—';
+    position: absolute; left: 0; color: #4a5c8a;
+  }
+  .cv-bands-edu { margin-bottom: 10px; }
+  .cv-bands-edu-inst { font-size: 8.5px; font-weight: 600; color: #111; }
+  .cv-bands-edu-detail { font-size: 7.5px; color: #888; }
+  .cv-bands-skill-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 7.5px; color: #4b5563; margin-bottom: 4px;
+  }
+  .cv-bands-skill-item::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #4a5c8a;
+    flex-shrink: 0;
+  }
+  .cv-bands-soft-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #c5cce0;
+    border-radius: 12px;
+    font-size: 7px;
+    color: #4a5c8a;
+    margin: 2px 3px 2px 0;
+  }
+  .cv-bands-cert-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 8px; color: #4b5563; margin-bottom: 4px;
+  }
+  .cv-bands-cert-icon { color: #4a5c8a; font-size: 10px; }
+
+  @media (max-width: 1100px) {
+    .option-card {
+      grid-template-columns: 1fr;
+    }
+    .cv-preview {
+      width: 100%;
+      max-width: 595px;
+      margin: 0 auto;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>5 Opsi Desain CV Minimalist</h1>
+  <p>Kurasi dan pilih desain terbaik. Setiap opsi membawa filosofi visual yang berbeda.</p>
+</div>
+
+<div class="options-container">
+
+<!-- ==================== OPTION 1: Swiss Grid ==================== -->
+<div class="option-card">
+  <div class="cv-preview">
+    <div class="cv-swiss">
+      <div class="header-name">Sarah Anderson</div>
+      <div class="header-title">Senior Product Designer</div>
+      <div class="contact-row">
+        <span>✉ sarah@email.com</span>
+        <span>☎ +62 812 3456 7890</span>
+        <span>⌖ Jakarta, Indonesia</span>
+        <span>◉ linkedin.com/in/sarah</span>
+      </div>
+      <div class="divider"></div>
+
+      <div class="section">
+        <div class="section-title">Profile Summary</div>
+        <div class="summary-text">
+          Experienced product designer with 6+ years crafting intuitive digital experiences for fintech and SaaS platforms. Passionate about user-centered design, design systems, and bridging the gap between business goals and user needs. Led design for products serving 2M+ active users across Southeast Asia.
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Work Experience</div>
+        <div class="exp-entry">
+          <div class="exp-header">
+            <div class="exp-role">Lead Product Designer</div>
+            <div class="exp-date">Jan 2022 – Present</div>
+          </div>
+          <div class="exp-company">Tokopay Digital • Jakarta • Full-time</div>
+          <ul class="exp-bullets">
+            <li>Led redesign of core payment flow, reducing drop-off rate by 34%</li>
+            <li>Built and maintained design system used by 12 product teams</li>
+            <li>Conducted 40+ user research sessions to validate design decisions</li>
+          </ul>
+        </div>
+        <div class="exp-entry">
+          <div class="exp-header">
+            <div class="exp-role">UI/UX Designer</div>
+            <div class="exp-date">Mar 2019 – Dec 2021</div>
+          </div>
+          <div class="exp-company">Kreativa Studio • Bandung • Full-time</div>
+          <ul class="exp-bullets">
+            <li>Designed mobile apps for 8 clients across healthcare and e-commerce</li>
+            <li>Improved user satisfaction scores by 28% through iterative prototyping</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Education</div>
+        <div class="edu-entry">
+          <div class="edu-inst">Universitas Indonesia</div>
+          <div class="edu-detail">S1 Desain Komunikasi Visual • 2015 – 2019 • IPK 3.82</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skills-list">
+          Figma, Adobe XD, Sketch, Prototyping, User Research, Design Systems, HTML/CSS, Framer, Miro, Jira, Usability Testing, Wireframing, Information Architecture
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-info">
+    <div class="option-number">Opsi 1</div>
+    <div class="option-name">Swiss Grid</div>
+    <div class="option-philosophy">
+      Terinspirasi Swiss International Style — tipografi sebagai satu-satunya elemen visual. Whitespace yang generous menjadi "decoration". Content berbicara sendiri tanpa perlu ornamen.
+    </div>
+    <table class="spec-table">
+      <tr><td>Layout</td><td>Full single-column, tanpa sidebar</td></tr>
+      <tr><td>Photo</td><td>Tanpa foto (pure typography)</td></tr>
+      <tr><td>Heading Style</td><td>Dash accent + uppercase + wide tracking</td></tr>
+      <tr><td>Accent</td><td>Single color — dark teal</td></tr>
+      <tr><td>Typography</td><td>Sans-serif, bold hierarchy</td></tr>
+      <tr><td>Bullets</td><td>Em-dash prefix (— )</td></tr>
+    </table>
+    <div class="pros-cons">
+      <div class="pros"><strong>✓ Kelebihan</strong>Ultra bersih, sangat ATS-friendly, timeless, profesional untuk industri formal</div>
+      <div class="cons"><strong>✗ Kekurangan</strong>Bisa terasa "datar" bagi yang menyukai visual variety</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPTION 2: Asymmetric Split ==================== -->
+<div class="option-card">
+  <div class="cv-preview">
+    <div class="cv-asymmetric">
+      <div class="cv-asym-left">
+        <div class="cv-asym-photo">👤</div>
+        
+        <div>
+          <div class="cv-asym-section-title">Contact</div>
+          <div class="cv-asym-contact-item"><span class="cv-asym-contact-icon">✉</span> sarah@email.com</div>
+          <div class="cv-asym-contact-item"><span class="cv-asym-contact-icon">☎</span> +62 812 3456 7890</div>
+          <div class="cv-asym-contact-item"><span class="cv-asym-contact-icon">◎</span> sarahdesign.com</div>
+          <div class="cv-asym-contact-item"><span class="cv-asym-contact-icon">◉</span> linkedin.com/in/sarah</div>
+          <div class="cv-asym-contact-item"><span class="cv-asym-contact-icon">⌖</span> Jakarta, Indonesia</div>
+        </div>
+
+        <div>
+          <div class="cv-asym-section-title">Education</div>
+          <div class="cv-asym-edu">
+            <div class="cv-asym-edu-inst">Universitas Indonesia</div>
+            <div class="cv-asym-edu-detail">S1 Desain Komunikasi Visual</div>
+            <div class="cv-asym-edu-detail">2015 – 2019 • IPK 3.82</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="cv-asym-section-title">Hard Skills</div>
+          <div class="cv-asym-skill-dot">Figma</div>
+          <div class="cv-asym-skill-dot">Adobe XD</div>
+          <div class="cv-asym-skill-dot">Prototyping</div>
+          <div class="cv-asym-skill-dot">User Research</div>
+          <div class="cv-asym-skill-dot">Design Systems</div>
+          <div class="cv-asym-skill-dot">HTML/CSS</div>
+        </div>
+
+        <div>
+          <div class="cv-asym-section-title">Soft Skills</div>
+          <span class="cv-asym-tag">Leadership</span>
+          <span class="cv-asym-tag">Communication</span>
+          <span class="cv-asym-tag">Problem Solving</span>
+          <span class="cv-asym-tag">Teamwork</span>
+          <span class="cv-asym-tag">Adaptability</span>
+        </div>
+
+        <div>
+          <div class="cv-asym-section-title">Certifications</div>
+          <div style="font-size:7.5px;color:#6b7280;line-height:1.6">
+            <div style="margin-bottom:3px">› Google UX Design Certificate</div>
+            <div style="margin-bottom:3px">› Interaction Design Foundation</div>
+            <div>› AWS Cloud Practitioner</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-asym-right">
+        <div class="name">Sarah Anderson</div>
+        <div class="title">Senior Product Designer</div>
+        <div class="accent-line"></div>
+
+        <div class="cv-asym-right-section">
+          <div class="cv-asym-right-title">Profile Summary</div>
+          <div class="cv-asym-summary">
+            Experienced product designer with 6+ years crafting intuitive digital experiences for fintech and SaaS platforms. Passionate about user-centered design, design systems, and bridging the gap between business goals and user needs. Led design for products serving 2M+ active users.
+          </div>
+        </div>
+
+        <div class="cv-asym-right-section">
+          <div class="cv-asym-right-title">Work Experience</div>
+          <div class="cv-asym-exp">
+            <div class="cv-asym-exp-header">
+              <div class="cv-asym-exp-role">Lead Product Designer</div>
+              <div class="cv-asym-exp-date">Jan 2022 – Present</div>
+            </div>
+            <div class="cv-asym-exp-company">Tokopay Digital • Jakarta • Full-time</div>
+            <ul class="cv-asym-exp-bullets">
+              <li>Led redesign of core payment flow, reducing drop-off by 34%</li>
+              <li>Built design system used by 12 product teams</li>
+              <li>Conducted 40+ user research sessions</li>
+            </ul>
+          </div>
+          <div class="cv-asym-exp">
+            <div class="cv-asym-exp-header">
+              <div class="cv-asym-exp-role">UI/UX Designer</div>
+              <div class="cv-asym-exp-date">Mar 2019 – Dec 2021</div>
+            </div>
+            <div class="cv-asym-exp-company">Kreativa Studio • Bandung • Full-time</div>
+            <ul class="cv-asym-exp-bullets">
+              <li>Designed mobile apps for 8 clients</li>
+              <li>Improved user satisfaction scores by 28%</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-info">
+    <div class="option-number">Opsi 2</div>
+    <div class="option-name">Asymmetric Split</div>
+    <div class="option-philosophy">
+      Editorial magazine feel — asimetri 30/70 yang terstruktur dengan vertical line separator. Whitespace digunakan sebagai elemen desain aktif. Serif font untuk nama memberikan sentuhan klasik.
+    </div>
+    <table class="spec-table">
+      <tr><td>Layout</td><td>Two-column 30/70, tanpa warna sidebar</td></tr>
+      <tr><td>Photo</td><td>Small circular photo di atas left column</td></tr>
+      <tr><td>Heading Style</td><td>Square accent + uppercase tracking</td></tr>
+      <tr><td>Accent</td><td>Warm terracotta/rust (#c45c3c)</td></tr>
+      <tr><td>Name Font</td><td>Serif (editorial feel)</td></tr>
+      <tr><td>Separator</td><td>Vertical thin line + short accent line</td></tr>
+    </table>
+    <div class="pros-cons">
+      <div class="pros"><strong>✓ Kelebihan</strong>Seimbang informasi & estetika, foto natural, magazine-quality layout</div>
+      <div class="cons"><strong>✗ Kekurangan</strong>Perlu cukup konten agar kolom kiri tidak terasa kosong</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPTION 3: Baseline ==================== -->
+<div class="option-card">
+  <div class="cv-preview">
+    <div class="cv-baseline">
+      <div class="header-name">Sarah Anderson</div>
+      <div class="header-title">Senior Product Designer</div>
+      <div class="contact-bar">
+        sarah@email.com <span>|</span> +62 812 3456 7890 <span>|</span> Jakarta, Indonesia <span>|</span> linkedin.com/in/sarah
+      </div>
+      <div class="thick-line"></div>
+
+      <div class="section">
+        <div class="section-title">About Me</div>
+        <div class="summary-text">
+          Experienced product designer with 6+ years crafting intuitive digital experiences for fintech and SaaS platforms. Passionate about user-centered design, design systems, and bridging the gap between business goals and user needs. Led design for products serving 2M+ active users across Southeast Asia.
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Experience</div>
+        <div class="exp-entry">
+          <div class="exp-role">Lead Product Designer</div>
+          <div class="exp-meta">Tokopay Digital • Jakarta • Full-time • Jan 2022 – Present</div>
+          <ul class="exp-bullets">
+            <li>Led redesign of core payment flow, reducing drop-off rate by 34%</li>
+            <li>Built and maintained design system used by 12 product teams</li>
+            <li>Conducted 40+ user research sessions to validate design decisions</li>
+          </ul>
+        </div>
+        <div class="exp-entry">
+          <div class="exp-role">UI/UX Designer</div>
+          <div class="exp-meta">Kreativa Studio • Bandung • Full-time • Mar 2019 – Dec 2021</div>
+          <ul class="exp-bullets">
+            <li>Designed mobile apps for 8 clients across healthcare and e-commerce</li>
+            <li>Improved user satisfaction scores by 28% through iterative prototyping</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Education</div>
+        <div class="edu-inline">
+          <strong>S1 Desain Komunikasi Visual</strong> — Universitas Indonesia <span class="date">• 2015 – 2019 • IPK 3.82</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="skills-grid">
+          <span class="skill-tag">Figma</span>
+          <span class="skill-tag">Adobe XD</span>
+          <span class="skill-tag">Sketch</span>
+          <span class="skill-tag">Prototyping</span>
+          <span class="skill-tag">User Research</span>
+          <span class="skill-tag">Design Systems</span>
+          <span class="skill-tag">HTML/CSS</span>
+          <span class="skill-tag">Framer</span>
+          <span class="skill-tag">Leadership</span>
+          <span class="skill-tag">Communication</span>
+          <span class="skill-tag">Problem Solving</span>
+          <span class="skill-tag">Teamwork</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Certifications</div>
+        <div style="font-size:8.5px;color:#4b5563;line-height:1.6">
+          <div>– Google UX Design Professional Certificate</div>
+          <div>– Interaction Design Foundation Member</div>
+          <div>– AWS Cloud Practitioner</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-info">
+    <div class="option-number">Opsi 3</div>
+    <div class="option-name">Baseline</div>
+    <div class="option-philosophy">
+      Content-first philosophy — CV sebagai "beautifully typeset document". Setiap section dimulai dengan overline accent yang memberikan rhythm visual. Tidak ada yang mengalihkan perhatian dari konten.
+    </div>
+    <table class="spec-table">
+      <tr><td>Layout</td><td>Full single-column, completely linear</td></tr>
+      <tr><td>Photo</td><td>Tanpa foto</td></tr>
+      <tr><td>Heading Style</td><td>Overline (accent line di atas heading)</td></tr>
+      <tr><td>Accent</td><td>Deep navy (#1e3a5f)</td></tr>
+      <tr><td>Contact</td><td>Pipe-separated horizontal bar</td></tr>
+      <tr><td>Skills</td><td>Grid of subtle gray tags</td></tr>
+    </table>
+    <div class="pros-cons">
+      <div class="pros"><strong>✓ Kelebihan</strong>Paling mudah dibaca, sangat ATS-friendly, konten sebagai raja, timeless</div>
+      <div class="cons"><strong>✗ Kekurangan</strong>Mungkin terlalu sederhana bagi yang suka visual complexity</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPTION 4: Monochrome Sidebar ==================== -->
+<div class="option-card">
+  <div class="cv-preview">
+    <div class="cv-monosidebar">
+      <div class="cv-mono-left">
+        <div class="cv-mono-photo">👤</div>
+        <div class="cv-mono-name">Sarah Anderson</div>
+        <div class="cv-mono-title">Product Designer</div>
+        <div class="cv-mono-divider"></div>
+
+        <div class="cv-mono-section">
+          <div class="cv-mono-section-title">Contact</div>
+          <div class="cv-mono-contact-item"><span class="cv-mono-contact-icon">✉</span> sarah@email.com</div>
+          <div class="cv-mono-contact-item"><span class="cv-mono-contact-icon">☎</span> +62 812 3456 7890</div>
+          <div class="cv-mono-contact-item"><span class="cv-mono-contact-icon">◎</span> sarahdesign.com</div>
+          <div class="cv-mono-contact-item"><span class="cv-mono-contact-icon">◉</span> linkedin.com/in/sarah</div>
+          <div class="cv-mono-contact-item"><span class="cv-mono-contact-icon">⌖</span> Jakarta, Indonesia</div>
+        </div>
+
+        <div class="cv-mono-section">
+          <div class="cv-mono-section-title">Education</div>
+          <div class="cv-mono-edu">
+            <div class="cv-mono-edu-inst">Universitas Indonesia</div>
+            <div class="cv-mono-edu-detail">S1 Desain Komunikasi Visual</div>
+            <div class="cv-mono-edu-detail">2015 – 2019 • IPK 3.82</div>
+          </div>
+        </div>
+
+        <div class="cv-mono-section">
+          <div class="cv-mono-section-title">Skills</div>
+          <div class="cv-mono-skill-bar">
+            <div class="cv-mono-skill-name">Figma</div>
+            <div class="cv-mono-bar-bg"><div class="cv-mono-bar-fill" style="width:92%"></div></div>
+          </div>
+          <div class="cv-mono-skill-bar">
+            <div class="cv-mono-skill-name">Adobe XD</div>
+            <div class="cv-mono-bar-bg"><div class="cv-mono-bar-fill" style="width:85%"></div></div>
+          </div>
+          <div class="cv-mono-skill-bar">
+            <div class="cv-mono-skill-name">Prototyping</div>
+            <div class="cv-mono-bar-bg"><div class="cv-mono-bar-fill" style="width:88%"></div></div>
+          </div>
+          <div class="cv-mono-skill-bar">
+            <div class="cv-mono-skill-name">User Research</div>
+            <div class="cv-mono-bar-bg"><div class="cv-mono-bar-fill" style="width:80%"></div></div>
+          </div>
+          <div class="cv-mono-skill-bar">
+            <div class="cv-mono-skill-name">Design Systems</div>
+            <div class="cv-mono-bar-bg"><div class="cv-mono-bar-fill" style="width:90%"></div></div>
+          </div>
+          <div class="cv-mono-skill-bar">
+            <div class="cv-mono-skill-name">HTML/CSS</div>
+            <div class="cv-mono-bar-bg"><div class="cv-mono-bar-fill" style="width:75%"></div></div>
+          </div>
+        </div>
+
+        <div class="cv-mono-section">
+          <div class="cv-mono-section-title">Certifications</div>
+          <div style="font-size:7.5px;color:#6b7280;line-height:1.7">
+            <div>› Google UX Design</div>
+            <div>› IDF Member</div>
+            <div>› AWS Cloud Practitioner</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-mono-right">
+        <div>
+          <div class="cv-mono-right-title">Profile Summary</div>
+          <div class="cv-mono-summary">
+            Experienced product designer with 6+ years crafting intuitive digital experiences for fintech and SaaS platforms. Passionate about user-centered design, design systems, and bridging the gap between business goals and user needs. Led design for products serving 2M+ active users.
+          </div>
+        </div>
+
+        <div>
+          <div class="cv-mono-right-title">Work Experience</div>
+          <div class="cv-mono-timeline">
+            <div class="cv-mono-tl-entry">
+              <div class="cv-mono-tl-role">Lead Product Designer</div>
+              <div class="cv-mono-tl-company">Tokopay Digital • Jakarta • Full-time</div>
+              <div class="cv-mono-tl-date">Jan 2022 – Present</div>
+              <ul class="cv-mono-tl-bullets">
+                <li>Led redesign of core payment flow, reducing drop-off by 34%</li>
+                <li>Built design system used by 12 product teams</li>
+                <li>Conducted 40+ user research sessions</li>
+              </ul>
+            </div>
+            <div class="cv-mono-tl-entry">
+              <div class="cv-mono-tl-role">UI/UX Designer</div>
+              <div class="cv-mono-tl-company">Kreativa Studio • Bandung • Full-time</div>
+              <div class="cv-mono-tl-date">Mar 2019 – Dec 2021</div>
+              <ul class="cv-mono-tl-bullets">
+                <li>Designed mobile apps for 8 clients</li>
+                <li>Improved user satisfaction by 28%</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-info">
+    <div class="option-number">Opsi 4</div>
+    <div class="option-name">Monochrome Sidebar</div>
+    <div class="option-philosophy">
+      Warm minimalism — sidebar dengan subtle warm gray background menciptakan visual hierarchy yang natural. Timeline-style experience entries memberikan sense of progression. Skill bars menambah elemen visual tanpa berlebihan.
+    </div>
+    <table class="spec-table">
+      <tr><td>Layout</td><td>Two-column: sidebar 35% (warm gray) + content 65% (white)</td></tr>
+      <tr><td>Photo</td><td>Circular photo prominent di atas sidebar</td></tr>
+      <tr><td>Heading Style</td><td>Underline accent (right) / letter-spacing (left)</td></tr>
+      <tr><td>Accent</td><td>Olive green (#5a6e47)</td></tr>
+      <tr><td>Experience</td><td>Timeline with connected dots</td></tr>
+      <tr><td>Skills</td><td>Progress bars</td></tr>
+    </table>
+    <div class="pros-cons">
+      <div class="pros"><strong>✓ Kelebihan</strong>Hangat & inviting, timeline jelas, photo prominent, structured hierarchy</div>
+      <div class="cons"><strong>✗ Kekurangan</strong>Sidebar berwarna kurang "pure minimalist", progress bars subjektif</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPTION 5: Horizontal Bands ==================== -->
+<div class="option-card">
+  <div class="cv-preview">
+    <div class="cv-bands">
+      <div class="cv-bands-header">
+        <div class="cv-bands-header-left">
+          <div class="cv-bands-name">Sarah Anderson</div>
+          <div class="cv-bands-title">Senior Product Designer</div>
+        </div>
+        <div class="cv-bands-contact">
+          <div class="cv-bands-contact-item"><span>sarah@email.com</span> <span class="cv-bands-contact-icon">✉</span></div>
+          <div class="cv-bands-contact-item"><span>+62 812 3456 7890</span> <span class="cv-bands-contact-icon">☎</span></div>
+          <div class="cv-bands-contact-item"><span>Jakarta, Indonesia</span> <span class="cv-bands-contact-icon">⌖</span></div>
+          <div class="cv-bands-contact-item"><span>linkedin.com/in/sarah</span> <span class="cv-bands-contact-icon">◉</span></div>
+        </div>
+      </div>
+
+      <div class="cv-bands-body">
+        <div class="cv-bands-left">
+          <div>
+            <div class="cv-bands-section-title">Education</div>
+            <div class="cv-bands-edu">
+              <div class="cv-bands-edu-inst">Universitas Indonesia</div>
+              <div class="cv-bands-edu-detail">S1 Desain Komunikasi Visual</div>
+              <div class="cv-bands-edu-detail">2015 – 2019 • IPK 3.82</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="cv-bands-section-title">Hard Skills</div>
+            <div class="cv-bands-skill-item">Figma</div>
+            <div class="cv-bands-skill-item">Adobe XD</div>
+            <div class="cv-bands-skill-item">Prototyping</div>
+            <div class="cv-bands-skill-item">User Research</div>
+            <div class="cv-bands-skill-item">Design Systems</div>
+            <div class="cv-bands-skill-item">HTML/CSS</div>
+          </div>
+
+          <div>
+            <div class="cv-bands-section-title">Soft Skills</div>
+            <span class="cv-bands-soft-tag">Leadership</span>
+            <span class="cv-bands-soft-tag">Communication</span>
+            <span class="cv-bands-soft-tag">Problem Solving</span>
+            <span class="cv-bands-soft-tag">Teamwork</span>
+            <span class="cv-bands-soft-tag">Adaptability</span>
+          </div>
+
+          <div>
+            <div class="cv-bands-section-title">Certifications</div>
+            <div class="cv-bands-cert-item"><span class="cv-bands-cert-icon">✓</span> Google UX Design Certificate</div>
+            <div class="cv-bands-cert-item"><span class="cv-bands-cert-icon">✓</span> Interaction Design Foundation</div>
+            <div class="cv-bands-cert-item"><span class="cv-bands-cert-icon">✓</span> AWS Cloud Practitioner</div>
+          </div>
+        </div>
+
+        <div class="cv-bands-right">
+          <div>
+            <div class="cv-bands-section-title">Profile Summary</div>
+            <div class="cv-bands-summary">
+              Experienced product designer with 6+ years crafting intuitive digital experiences for fintech and SaaS platforms. Passionate about user-centered design, design systems, and bridging the gap between business goals and user needs. Led design for products serving 2M+ active users.
+            </div>
+          </div>
+
+          <div>
+            <div class="cv-bands-section-title">Work Experience</div>
+            <div class="cv-bands-exp">
+              <div class="cv-bands-exp-header">
+                <div class="cv-bands-exp-role">Lead Product Designer</div>
+                <div class="cv-bands-exp-date">Jan 2022 – Present</div>
+              </div>
+              <div class="cv-bands-exp-company">Tokopay Digital • Jakarta • Full-time</div>
+              <ul class="cv-bands-exp-bullets">
+                <li>Led redesign of core payment flow, reducing drop-off rate by 34%</li>
+                <li>Built and maintained design system used by 12 product teams</li>
+                <li>Conducted 40+ user research sessions to validate design decisions</li>
+              </ul>
+            </div>
+            <div class="cv-bands-exp">
+              <div class="cv-bands-exp-header">
+                <div class="cv-bands-exp-role">UI/UX Designer</div>
+                <div class="cv-bands-exp-date">Mar 2019 – Dec 2021</div>
+              </div>
+              <div class="cv-bands-exp-company">Kreativa Studio • Bandung • Full-time</div>
+              <ul class="cv-bands-exp-bullets">
+                <li>Designed mobile apps for 8 clients across healthcare and e-commerce</li>
+                <li>Improved user satisfaction scores by 28% through iterative prototyping</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-info">
+    <div class="option-number">Opsi 5</div>
+    <div class="option-name">Horizontal Bands</div>
+    <div class="option-philosophy">
+      Architectural design — header band yang impactful dengan contact info tersusun rapi di sisi kanan. Body menggunakan grid 40/60 dengan section dividers yang memberikan visual rhythm terstruktur.
+    </div>
+    <table class="spec-table">
+      <tr><td>Layout</td><td>Header band + two-column body (38/62)</td></tr>
+      <tr><td>Photo</td><td>Opsional</td></tr>
+      <tr><td>Header</td><td>Full-width subtle gray band, contact right-aligned</td></tr>
+      <tr><td>Accent</td><td>Slate blue (#4a5c8a)</td></tr>
+      <tr><td>Section Dividers</td><td>Thin underlines di setiap heading</td></tr>
+      <tr><td>Summary</td><td>Left accent border style</td></tr>
+    </table>
+    <div class="pros-cons">
+      <div class="pros"><strong>✓ Kelebihan</strong>Sangat terstruktur, mudah di-scan, header impactful, organized</div>
+      <div class="cons"><strong>✗ Kekurangan</strong>Band separation bisa terasa "boxy" jika konten minim</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>
