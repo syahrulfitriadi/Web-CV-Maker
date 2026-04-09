@@ -317,7 +317,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
 
         {/* EXPERIENCE */}
         {experience.some(e => e.company || e.role) && (
-          <section style={{ marginBottom: 24, flex: 1 }}>
+          <section style={{ marginBottom: 24 }}>
             <MainSectionTitle text="Experience" color={tc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {experience.filter(e => e.company || e.role).map((exp, i) => (
@@ -372,7 +372,24 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
           </section>
         )}
 
-
+        {/* Decorative bottom accent — pushes to bottom in PDF, stays after content in preview */}
+        <div style={{
+          marginTop: 'auto', paddingTop: 20,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <div style={{
+            flex: 1, height: 1,
+            background: `linear-gradient(90deg, ${hexToRgba(tc, 0.15)}, transparent)`,
+          }} />
+          <div style={{
+            width: 5, height: 5, transform: 'rotate(45deg)',
+            background: tc, opacity: 0.15,
+          }} />
+          <div style={{
+            width: 30, height: 1,
+            background: hexToRgba(tc, 0.1),
+          }} />
+        </div>
       </main>
     </div>
   )

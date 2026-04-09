@@ -7,13 +7,13 @@ const templates = [
     id: 'classic',
     name: 'Classic',
     desc: 'Desain profesional dengan sidebar putih dan aksen warna — cocok untuk semua industri.',
-    image: '/template-classic.png',
+    image: '/Sample 1.webp',
   },
   {
     id: 'modern',
     name: 'Modern',
     desc: 'Layout bersih dengan sidebar berwarna dan foto bulat — sempurna untuk industri kreatif.',
-    image: '/template-modern.png',
+    image: '/sample 2.webp',
   },
 ]
 

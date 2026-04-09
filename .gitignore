@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Reference & draft assets
+Referensi CV/
+review_pict/
+
+# Old template preview images
+public/template-classic.png
+public/template-modern.png

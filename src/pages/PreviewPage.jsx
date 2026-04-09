@@ -1,10 +1,10 @@
-import { useRef, useCallback, useState } from 'react'
+import { useRef, useCallback, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
 import { FONT_OPTIONS, migrateFontId } from '../utils/fonts'
-import { Download, Palette, Type, ArrowLeft, Check, Loader2 } from 'lucide-react'
+import { Download, Palette, Type, ArrowLeft, Check, Loader2, FileText } from 'lucide-react'
 
 const themeColors = [
   { name: 'Sky Blue', value: '#0ea5e9' },
@@ -26,7 +26,21 @@ export default function PreviewPage() {
 
   const previewRef = useRef(null)
   const [isExporting, setIsExporting] = useState(false)
+  const [contentHeight, setContentHeight] = useState(1123)
+  const [pdfSizeMode, setPdfSizeMode] = useState('dynamic') // 'dynamic' | 'a4'
   const cvData = { personalInfo, summary, experience, education, skills, certifications }
+
+  // Track actual content height for dynamic preview sizing
+  useEffect(() => {
+    const el = previewRef.current
+    if (!el) return
+    const ro = new ResizeObserver(() => {
+      const h = el.offsetHeight
+      if (h > 0) setContentHeight(Math.min(h, 1123))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const handleDownload = useCallback(async () => {
     const element = previewRef.current
@@ -45,6 +59,12 @@ export default function PreviewPage() {
       // Get the CV content HTML (all React inline styles are preserved)
       const cvContent = element.innerHTML
 
+      // Calculate page dimensions based on mode
+      const PX_TO_MM = 0.2646 // 1px at 96dpi ≈ 0.2646mm
+      const isA4 = pdfSizeMode === 'a4'
+      const pageHeightPx = isA4 ? 1123 : contentHeight
+      const pageHeightMm = isA4 ? 297 : Math.min(Math.ceil(contentHeight * PX_TO_MM) + 1, 297)
+
       // Build a print-optimized HTML document
       const printHTML = `<!DOCTYPE html>
 <html lang="id">
@@ -54,7 +74,7 @@ export default function PreviewPage() {
 ${fontLinks}
 <style>
   @page {
-    size: 210mm 297mm;
+    size: 210mm ${pageHeightMm}mm;
     margin: 0;
   }
   *, *::before, *::after {
@@ -64,7 +84,7 @@ ${fontLinks}
     margin: 0;
     padding: 0;
     width: 794px;
-    height: 1123px;
+    height: ${pageHeightPx}px;
     overflow: hidden;
     background: white;
     /* Force print backgrounds and colors */
@@ -135,7 +155,7 @@ ${fontLinks}
     } finally {
       setIsExporting(false)
     }
-  }, [personalInfo.name, isExporting])
+  }, [personalInfo.name, isExporting, pdfSizeMode, contentHeight])
 
   const TemplateComponent = selectedTemplate === 'classic' ? ClassicTemplate : ModernTemplate
 
@@ -259,6 +279,39 @@ ${fontLinks}
                 </button>
               ))}
             </div>
+
+            {/* PDF Size Mode */}
+            <div style={{ background: 'white', borderRadius: 18, padding: 20, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <FileText style={{ width: 16, height: 16, color: '#0ea5e9' }} />
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>Ukuran PDF</span>
+              </div>
+              {[
+                { id: 'dynamic', label: 'Sesuai Konten', desc: 'PDF mengikuti panjang isi CV' },
+                { id: 'a4', label: 'A4 Penuh', desc: 'Selalu 210 × 297 mm standar' },
+              ].map((mode) => {
+                const isActive = pdfSizeMode === mode.id
+                return (
+                  <button key={mode.id} onClick={() => setPdfSizeMode(mode.id)}
+                    style={{
+                      width: '100%', padding: '10px 14px', borderRadius: 12, marginBottom: 6,
+                      cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s',
+                      background: isActive ? '#eff6ff' : '#f8fafc',
+                      border: isActive ? '1.5px solid #bfdbfe' : '1.5px solid #e2e8f0',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: isActive ? 600 : 400, color: isActive ? '#0369a1' : '#475569' }}>
+                        {mode.label}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{mode.desc}</div>
+                    </div>
+                    {isActive && <Check style={{ width: 14, height: 14, color: '#0369a1', flexShrink: 0 }} />}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {/* Preview */}
@@ -270,10 +323,12 @@ ${fontLinks}
                 <div
                   ref={previewRef}
                   style={{
-                    width: 794, height: 1123,
+                    width: 794,
+                    maxHeight: 1123,
+                    overflow: 'hidden',
                     transform: 'scale(0.78)',
                     transformOrigin: 'top left',
-                    marginBottom: -1123 * (1 - 0.78),
+                    marginBottom: -contentHeight * (1 - 0.78),
                     pointerEvents: 'none',
                   }}
                 >
@@ -281,7 +336,7 @@ ${fontLinks}
                 </div>
               </div>
               <p style={{ textAlign: 'center', fontSize: 12, color: '#94a3b8', marginTop: 10 }}>
-                Preview skala 78% dari ukuran A4 asli
+                Preview skala 78% — PDF: {pdfSizeMode === 'a4' ? 'A4 (210×297mm)' : `Dinamis (210×${Math.min(Math.ceil(contentHeight * 0.2646) + 1, 297)}mm)`}
               </p>
             </div>
           </div>

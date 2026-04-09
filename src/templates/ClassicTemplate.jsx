@@ -363,6 +363,24 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
           </section>
         )}
 
+        {/* Decorative bottom accent — pushes to bottom in PDF, stays after content in preview */}
+        <div style={{
+          marginTop: 'auto', paddingTop: 20,
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <div style={{
+            flex: 1, height: 1,
+            background: `linear-gradient(90deg, ${hexToRgba(tc, 0.15)}, transparent)`,
+          }} />
+          <div style={{
+            width: 5, height: 5, borderRadius: '50%',
+            background: tc, opacity: 0.15,
+          }} />
+          <div style={{
+            width: 30, height: 1,
+            background: hexToRgba(tc, 0.1),
+          }} />
+        </div>
       </main>
     </div>
   )
