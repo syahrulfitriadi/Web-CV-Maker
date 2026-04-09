@@ -38,9 +38,14 @@ const templates = [
 
 export default function TemplateSelection() {
   const { selectedTemplate, setSelectedTemplate, setCurrentStep, themeColor } = useCVStore()
-  const [activeIndex, setActiveIndex] = useState(
-    Math.max(0, templates.findIndex(t => t.id === selectedTemplate))
-  )
+
+  // Default to Minimalist (index 2) if no template selected yet
+  const getInitialIndex = () => {
+    const idx = templates.findIndex(t => t.id === selectedTemplate)
+    return idx >= 0 ? idx : 2 // default to Minimalist
+  }
+
+  const [activeIndex, setActiveIndex] = useState(getInitialIndex)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const containerRef = useRef(null)
 
@@ -48,13 +53,23 @@ export default function TemplateSelection() {
   const dragStartX = useRef(0)
   const isDragging = useRef(false)
 
+  // Set Minimalist as default on first mount
+  useEffect(() => {
+    if (!selectedTemplate || selectedTemplate === 'classic') {
+      setSelectedTemplate(templates[2].id)
+    }
+  }, [])
+
   const activeTemplate = templates[activeIndex]
+  const total = templates.length
 
   const goTo = (index) => {
-    if (isTransitioning || index < 0 || index >= templates.length) return
+    if (isTransitioning) return
+    // Wrap around for loop
+    const wrapped = ((index % total) + total) % total
     setIsTransitioning(true)
-    setActiveIndex(index)
-    setSelectedTemplate(templates[index].id)
+    setActiveIndex(wrapped)
+    setSelectedTemplate(templates[wrapped].id)
     setTimeout(() => setIsTransitioning(false), 400)
   }
 
@@ -99,9 +114,13 @@ export default function TemplateSelection() {
     isDragging.current = false
   }
 
-  // Get the 3 visible cards: prev, active, next
+  // Get the 3 visible cards with loop support (shortest-path diff)
   const getCardStyle = (index) => {
-    const diff = index - activeIndex
+    // Calculate shortest distance for loop
+    let diff = index - activeIndex
+    if (diff > total / 2) diff -= total
+    if (diff < -total / 2) diff += total
+
     const isActive = diff === 0
     const isPrev = diff === -1
     const isNext = diff === 1
@@ -109,7 +128,7 @@ export default function TemplateSelection() {
     if (!isActive && !isPrev && !isNext) {
       return {
         opacity: 0,
-        transform: diff < -1 ? 'translateX(-180%) scale(0.7)' : 'translateX(180%) scale(0.7)',
+        transform: diff < 0 ? 'translateX(-180%) scale(0.65)' : 'translateX(180%) scale(0.65)',
         pointerEvents: 'none',
         zIndex: 0,
       }
@@ -126,21 +145,21 @@ export default function TemplateSelection() {
 
     if (isPrev) {
       return {
-        opacity: 0.55,
-        transform: 'translateX(-72%) scale(0.78)',
+        opacity: 0.5,
+        transform: 'translateX(-68%) scale(0.75)',
         zIndex: 2,
         pointerEvents: 'auto',
-        filter: 'brightness(0.7)',
+        filter: 'brightness(0.65)',
       }
     }
 
     if (isNext) {
       return {
-        opacity: 0.55,
-        transform: 'translateX(72%) scale(0.78)',
+        opacity: 0.5,
+        transform: 'translateX(68%) scale(0.75)',
         zIndex: 2,
         pointerEvents: 'auto',
-        filter: 'brightness(0.7)',
+        filter: 'brightness(0.65)',
       }
     }
   }
@@ -165,47 +184,43 @@ export default function TemplateSelection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.5 }}
-          style={{ position: 'relative', maxWidth: 800, margin: '0 auto' }}
+          style={{ position: 'relative', maxWidth: 960, margin: '0 auto' }}
         >
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows — always enabled for loop */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={goPrev}
-            disabled={activeIndex === 0}
             aria-label="Template sebelumnya"
             style={{
-              position: 'absolute', left: -20, top: '45%', transform: 'translateY(-50%)',
-              zIndex: 20, width: 44, height: 44, borderRadius: '50%',
-              background: activeIndex === 0 ? '#f1f5f9' : 'white',
-              border: 'none', cursor: activeIndex === 0 ? 'default' : 'pointer',
+              position: 'absolute', left: -24, top: '45%', transform: 'translateY(-50%)',
+              zIndex: 20, width: 46, height: 46, borderRadius: '50%',
+              background: 'white',
+              border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: activeIndex === 0 ? 'none' : '0 4px 20px rgba(0,0,0,0.12)',
-              opacity: activeIndex === 0 ? 0.4 : 1,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
               transition: 'all 0.3s',
             }}
           >
-            <ChevronLeft style={{ width: 22, height: 22, color: activeIndex === 0 ? '#94a3b8' : '#334155' }} />
+            <ChevronLeft style={{ width: 22, height: 22, color: '#334155' }} />
           </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={goNext}
-            disabled={activeIndex === templates.length - 1}
             aria-label="Template berikutnya"
             style={{
-              position: 'absolute', right: -20, top: '45%', transform: 'translateY(-50%)',
-              zIndex: 20, width: 44, height: 44, borderRadius: '50%',
-              background: activeIndex === templates.length - 1 ? '#f1f5f9' : 'white',
-              border: 'none', cursor: activeIndex === templates.length - 1 ? 'default' : 'pointer',
+              position: 'absolute', right: -24, top: '45%', transform: 'translateY(-50%)',
+              zIndex: 20, width: 46, height: 46, borderRadius: '50%',
+              background: 'white',
+              border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: activeIndex === templates.length - 1 ? 'none' : '0 4px 20px rgba(0,0,0,0.12)',
-              opacity: activeIndex === templates.length - 1 ? 0.4 : 1,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
               transition: 'all 0.3s',
             }}
           >
-            <ChevronRight style={{ width: 22, height: 22, color: activeIndex === templates.length - 1 ? '#94a3b8' : '#334155' }} />
+            <ChevronRight style={{ width: 22, height: 22, color: '#334155' }} />
           </motion.button>
 
           {/* Cards Container */}
@@ -217,7 +232,7 @@ export default function TemplateSelection() {
             onMouseUp={handleMouseUp}
             style={{
               position: 'relative',
-              height: 480,
+              height: 560,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -246,8 +261,8 @@ export default function TemplateSelection() {
                   }}
                   style={{
                     position: 'absolute',
-                    width: '58%',
-                    maxWidth: 360,
+                    width: '48%',
+                    maxWidth: 440,
                     borderRadius: 16,
                     overflow: 'hidden',
                     cursor: isActive ? 'default' : 'pointer',
