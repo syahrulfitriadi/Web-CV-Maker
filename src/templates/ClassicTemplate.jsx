@@ -6,6 +6,7 @@
 
 import { getPhotoStyle } from '../utils/photoStyle'
 import { getFontConfig, migrateFontId } from '../utils/fonts'
+import { getTranslations } from '../utils/translations'
 
 function hexToRgba(hex, alpha) {
   try {
@@ -28,14 +29,15 @@ function lightenColor(hex, amount = 0.15) {
   } catch { return hex }
 }
 
-export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFamily = 'inter' }) {
+export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFamily = 'inter', lang = 'id' }) {
   const { personalInfo, summary, experience, education, skills, certifications } = data
   const tc = themeColor
   const tcLight = lightenColor(tc, 0.85)
   const fontCfg = getFontConfig(migrateFontId(fontFamily))
   const ff = fontCfg.body
+  const t = getTranslations(lang)
 
-  const nameParts = (personalInfo.name || 'Nama Lengkap').split(' ')
+  const nameParts = (personalInfo.name || t.yourName).split(' ')
   const firstName = nameParts[0]
   const lastName = nameParts.slice(1).join(' ')
 
@@ -109,7 +111,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
               fontSize: 9, fontWeight: 600, letterSpacing: '0.15em',
               color: lightenColor(tc, 0.4), textTransform: 'uppercase',
             }}>
-              {personalInfo.title || 'Jabatan / Posisi'}
+              {personalInfo.title || t.jobTitle}
             </span>
           </div>
         </div>
@@ -130,7 +132,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
 
           {/* KONTAK */}
           <section>
-            <SidebarHeading text="KONTAK" color={tc} />
+            <SidebarHeading text={t.contact} color={tc} />
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { val: personalInfo.email, svg: emailSvg },
@@ -158,7 +160,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
           {/* KEMAMPUAN */}
           {(skills.hard.some(s => s) || skills.soft.some(s => s)) && (
             <section>
-              <SidebarHeading text="KEMAMPUAN" color={tc} />
+              <SidebarHeading text={t.skills} color={tc} />
 
               {skills.hard.some(s => s) && (
                 <div style={{ marginBottom: 10 }}>
@@ -213,19 +215,19 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
           {/* PENDIDIKAN */}
           {education.some(e => e.institution) && (
             <section>
-              <SidebarHeading text="PENDIDIKAN" color={tc} />
+              <SidebarHeading text={t.education} color={tc} />
               {education.filter(e => e.institution).map((edu, i) => (
                 <div key={i} style={{ marginBottom: 8, paddingLeft: 10, borderLeft: `2px solid ${hexToRgba(tc, 0.4)}` }}>
                   <p style={{ fontWeight: 700, fontSize: '8.5pt', color: '#ffffff', margin: '0 0 2px' }}>
                     {edu.institution}
                   </p>
                   <p style={{ fontSize: '7.5pt', color: sidebarText, margin: '0 0 1px' }}>
-                    {edu.degree}{edu.field ? ` ${edu.field}` : ''}
-                    {edu.gpa ? ` — IPK ${edu.gpa}` : ''}
+                    {edu.degree}{edu.field ? `${t.degreeOf}${edu.field}` : ''}
+                    {edu.gpa ? ` — ${t.gpaLabel} ${edu.gpa}` : ''}
                   </p>
                   {edu.startDate && (
                     <p style={{ fontSize: '7pt', color: sidebarLight, margin: 0 }}>
-                      {edu.startDate} – {edu.endDate || 'Sekarang'}
+                      {edu.startDate} – {edu.endDate || t.present}
                     </p>
                   )}
                 </div>
@@ -265,7 +267,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
         {/* RINGKASAN */}
         {summary && (
           <section style={{ marginBottom: 26, position: 'relative', zIndex: 1 }}>
-            <SectionTitle text="RINGKASAN PROFIL" color={tc} />
+            <SectionTitle text={t.profileSummary} color={tc} />
             <p style={{
               fontSize: '10pt', lineHeight: 1.75, color: '#374151',
               margin: '10px 0 0', textAlign: 'justify',
@@ -279,7 +281,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
         {/* PENGALAMAN */}
         {experience.some(e => e.company || e.role) && (
           <section style={{ position: 'relative', zIndex: 1, marginBottom: 24 }}>
-            <SectionTitle text="PENGALAMAN KERJA" color={tc} />
+            <SectionTitle text={t.workExperience} color={tc} />
             <div style={{
               marginTop: 12,
               display: 'flex', flexDirection: 'column',
@@ -308,7 +310,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
                           padding: '1px 8px', borderRadius: 4,
                           background: hexToRgba(tc, 0.08),
                         }}>
-                          {exp.startDate} – {exp.current ? 'Sekarang' : exp.endDate || ''}
+                          {exp.startDate} – {exp.current ? t.present : exp.endDate || ''}
                         </span>
                       )}
                     </div>
@@ -342,7 +344,7 @@ export default function ClassicTemplate({ data, themeColor = '#0077B6', fontFami
         {/* SERTIFIKASI — right after Pengalaman */}
         {certifications.some(c => c) && (
           <section style={{ marginBottom: 24, position: 'relative', zIndex: 1 }}>
-            <SectionTitle text="SERTIFIKASI" color={tc} />
+            <SectionTitle text={t.certifications} color={tc} />
             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 7 }}>
               {certifications.filter(c => c).map((cert, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

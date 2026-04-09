@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { getDummyData } from '../utils/dummyData'
 
 const defaultCV = {
   personalInfo: {
@@ -46,7 +47,9 @@ const defaultCV = {
   selectedTemplate: 'classic',
   themeColor: '#0ea5e9',
   fontFamily: 'inter',
+  cvLanguage: 'id',
   currentStep: 0,
+  _isDummyFilled: false,
 }
 
 export const useCVStore = create((set, get) => ({
@@ -222,92 +225,41 @@ export const useCVStore = create((set, get) => ({
   setThemeColor: (color) => set({ themeColor: color }),
   setFontFamily: (font) => set({ fontFamily: font }),
 
-  // DEV: Auto-fill dummy data
-  fillDummyData: () =>
+  // Language — auto-refills dummy data when switching if dummy is active
+  setCvLanguage: (lang) => {
+    const state = get()
+    if (state._isDummyFilled) {
+      const d = getDummyData(lang)
+      set({
+        cvLanguage: lang,
+        personalInfo: {
+          ...d.personalInfo,
+          // Preserve user photo if they uploaded one
+          photo: state.personalInfo.photo,
+          photoPreview: state.personalInfo.photoPreview,
+          photoCrop: state.personalInfo.photoCrop,
+        },
+        summary: d.summary,
+        experience: d.experience,
+        education: d.education,
+        skills: d.skills,
+        certifications: d.certifications,
+      })
+    } else {
+      set({ cvLanguage: lang })
+    }
+  },
+
+  // DEV: Auto-fill dummy data (uses current language)
+  fillDummyData: () => {
+    const lang = get().cvLanguage
+    const d = getDummyData(lang)
     set({
-      personalInfo: {
-        name: 'Andi Pratama',
-        title: 'Graphic Designer',
-        email: 'andi@email.com',
-        phone: '+62-851-3499-4328',
-        address: 'Jakarta, Indonesia',
-        website: 'www.andi.io',
-        linkedin: 'linkedin.com/in/andi',
-        photo: null,
-        photoPreview: null,
-      },
-      summary:
-        'Seorang entry-level Desainer Grafis dengan pengalaman 6 bulan sebagai Graphic Design Intern di salah satu perusahaan multinasional. Memiliki spesialisasi dalam desain logo, desain 3D, dan ilustrasi digital.',
-      experience: [
-        {
-          id: crypto.randomUUID(),
-          company: 'PT ABC',
-          location: 'Jakarta, Indonesia',
-          role: 'Graphic Designer Intern',
-          type: 'Internship',
-          startDate: 'Januari 2022',
-          endDate: 'Juli 2022',
-          current: false,
-          bullets: [
-            'Membuat desain visual untuk situs web perusahaan dan akun media sosial.',
-            'Membuat konsep visual berdasarkan ketentuan brand.',
-            'Membuat draft awal dan mempresentasikan ide kepada design lead.',
-            'Bekerja sama dengan copywriter dan koordinator media sosial untuk finalisasi desain akhir.',
-          ],
-        },
-        {
-          id: crypto.randomUUID(),
-          company: 'Freelance',
-          location: 'Remote',
-          role: 'Graphic Designer',
-          type: 'Freelance',
-          startDate: 'Januari 2020',
-          endDate: 'Desember 2021',
-          current: false,
-          bullets: [
-            'Mempelajari design brief dan memberi rekomendasi pada klien.',
-            'Bernegosiasi dengan klien dan menentukan anggaran akhir.',
-            'Merevisi desain berdasarkan feedback dari klien.',
-            'Memastikan desain dan tata letak akhir menarik secara visual.',
-          ],
-        },
-      ],
-      education: [
-        {
-          id: crypto.randomUUID(),
-          institution: 'Universitas ABC',
-          degree: 'S1',
-          field: 'DKV',
-          gpa: '3.88',
-          startDate: '2017',
-          endDate: '2021',
-        },
-      ],
-      skills: {
-        hard: [
-          'Adobe Photoshop',
-          'Adobe Illustrator',
-          'Adobe InDesign',
-          'CorelDraw',
-          'Logo design',
-          'Visual design',
-        ],
-        soft: [
-          'Kemampuan interpersonal',
-          'Kreatif',
-          'Pemecahan masalah',
-          'Manajemen waktu',
-          'Berpikir kritis',
-        ],
-      },
-      certifications: [
-        'Adobe Certified Professional – Photoshop, 2021',
-        'Google UX Design Professional Certificate, 2022',
-        'Certified Graphic Designer (CGD) – AIGA, 2021',
-        'HubSpot Content Marketing Certification, 2022',
-      ],
-    }),
+      ...d,
+      _isDummyFilled: true,
+    })
+  },
 
   // Reset
-  resetCV: () => set({ ...defaultCV, currentStep: 0 }),
+  resetCV: () => set({ ...defaultCV, _isDummyFilled: false, currentStep: 0 }),
 }))

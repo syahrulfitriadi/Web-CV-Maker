@@ -7,6 +7,7 @@
 
 import { getPhotoStyle } from '../utils/photoStyle'
 import { getFontConfig, migrateFontId } from '../utils/fonts'
+import { getTranslations } from '../utils/translations'
 
 function hexToRgba(hex, alpha) {
   try {
@@ -41,7 +42,7 @@ function darkenColor(hex, amount = 0.2) {
   } catch { return hex }
 }
 
-export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamily = 'inter' }) {
+export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamily = 'inter', lang = 'id' }) {
   const { personalInfo, summary, experience, education, skills, certifications } = data
   const tc = themeColor
   const tcDark = darkenColor(tc, 0.25)
@@ -51,8 +52,9 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
   const fontCfg = getFontConfig(migrateFontId(fontFamily))
   const headingFont = fontCfg.heading
   const bodyFont = fontCfg.body
+  const t = getTranslations(lang)
 
-  const nameParts = (personalInfo.name || 'Nama Anda').split(' ')
+  const nameParts = (personalInfo.name || t.yourNameModern).split(' ')
   const firstName = nameParts[0]
   const lastName = nameParts.slice(1).join(' ')
 
@@ -143,7 +145,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
             color: tc, margin: '6px 0 0', textTransform: 'uppercase',
             fontFamily: headingFont,
           }}>
-            {personalInfo.title || 'Posisi / Jabatan'}
+            {personalInfo.title || t.jobTitleModern}
           </p>
         </div>
 
@@ -159,7 +161,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
 
         {/* CONTACT */}
         <div style={{ padding: '4px 22px 18px' }}>
-          <SectionHeader title="Contact" />
+          <SectionHeader title={t.contactModern} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {[
               { val: personalInfo.address, Icon: LocationIcon },
@@ -185,7 +187,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
         {/* EDUCATION */}
         {education.some(e => e.institution) && (
           <div style={{ padding: '0 22px 18px' }}>
-            <SectionHeader title="Education" />
+            <SectionHeader title={t.educationModern} />
             {education.filter(e => e.institution).map((edu, i) => (
               <div key={i} style={{
                 fontSize: '0.78rem', marginBottom: 10,
@@ -193,10 +195,10 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
               }}>
                 <p style={{ fontWeight: 700, margin: '0 0 2px', fontFamily: headingFont, color: '#1e293b' }}>{edu.institution}</p>
                 <p style={{ fontWeight: 600, margin: '0 0 2px', color: '#334155' }}>
-                  {edu.degree}{edu.field ? ` of ${edu.field}` : ''}
+                  {edu.degree}{edu.field ? `${t.degreeOf}${edu.field}` : ''}
                 </p>
-                {edu.gpa && <p style={{ fontStyle: 'italic', color: '#475569', margin: '0 0 2px', fontSize: '0.72rem' }}>CGPA {edu.gpa}</p>}
-                {edu.startDate && <p style={{ color: '#64748b', margin: 0, fontSize: '0.7rem' }}>{edu.startDate} - {edu.endDate || 'Sekarang'}</p>}
+                {edu.gpa && <p style={{ fontStyle: 'italic', color: '#475569', margin: '0 0 2px', fontSize: '0.72rem' }}>{t.gpaLabel} {edu.gpa}</p>}
+                {edu.startDate && <p style={{ color: '#64748b', margin: 0, fontSize: '0.7rem' }}>{edu.startDate} - {edu.endDate || t.present}</p>}
               </div>
             ))}
           </div>
@@ -205,7 +207,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
         {/* TOOLS & HARD SKILL */}
         {skills.hard.some(s => s) && (
           <div style={{ padding: '0 22px 18px' }}>
-            <SectionHeader title="Tools & Hard Skill" />
+            <SectionHeader title={t.hardSkill} />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
               {skills.hard.filter(s => s).map((s, i) => (
                 <span key={i} style={{
@@ -224,7 +226,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
         {/* SOFT SKILL */}
         {skills.soft.some(s => s) && (
           <div style={{ padding: '0 22px 18px' }}>
-            <SectionHeader title="Soft Skill" />
+            <SectionHeader title={t.softSkill} />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
               {skills.soft.filter(s => s).map((s, i) => (
                 <span key={i} style={{
@@ -275,7 +277,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
               color: tcDark, fontFamily: headingFont, textTransform: 'uppercase',
               margin: 0,
             }}>
-              {personalInfo.title || 'Posisi / Jabatan'}
+              {personalInfo.title || t.jobTitleModern}
             </h2>
           </div>
         </header>
@@ -283,7 +285,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
         {/* SUMMARY */}
         {summary && (
           <section style={{ marginBottom: 24 }}>
-            <MainSectionTitle text="Summary" color={tc} />
+            <MainSectionTitle text={t.summaryModern} color={tc} />
             <p style={{
               fontSize: '0.82rem', lineHeight: 1.75, textAlign: 'justify', margin: 0,
               color: '#374151', paddingLeft: 12, borderLeft: `2px solid ${hexToRgba(tc, 0.2)}`,
@@ -296,7 +298,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
         {/* CERTIFICATIONS — moved to top */}
         {certifications.some(c => c) && (
           <section style={{ marginBottom: 24 }}>
-            <MainSectionTitle text="Certifications" color={tc} />
+            <MainSectionTitle text={t.certificationsModern} color={tc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {certifications.filter(c => c).map((cert, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -318,7 +320,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
         {/* EXPERIENCE */}
         {experience.some(e => e.company || e.role) && (
           <section style={{ marginBottom: 24 }}>
-            <MainSectionTitle text="Experience" color={tc} />
+            <MainSectionTitle text={t.experienceModern} color={tc} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {experience.filter(e => e.company || e.role).map((exp, i) => (
                 <div key={i} style={{ display: 'flex', gap: 12 }}>
@@ -342,7 +344,7 @@ export default function ModernTemplate({ data, themeColor = '#3B82F6', fontFamil
                           padding: '1px 8px', borderRadius: 4,
                           background: hexToRgba(tc, 0.08),
                         }}>
-                          {exp.startDate} – {exp.current ? 'Sekarang' : exp.endDate || ''}
+                          {exp.startDate} – {exp.current ? t.present : exp.endDate || ''}
                         </span>
                       )}
                     </div>
