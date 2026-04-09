@@ -1,2 +1,0 @@
-1. dimenu kehalian tampilnya menjadi kosong, dan tidak bisa dikembalikan.
-2. preview tamplate menampilkan cv yang sudah jadi
