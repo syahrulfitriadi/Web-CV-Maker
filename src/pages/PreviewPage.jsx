@@ -41,9 +41,20 @@ export default function PreviewPage() {
   const [pdfSizeMode, setPdfSizeMode] = useState('dynamic') // 'dynamic' | 'a4'
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false)
   const [templateDropdownOpen, setTemplateDropdownOpen] = useState(false)
+  const [fontDropDirection, setFontDropDirection] = useState('down')
+  const [templateDropDirection, setTemplateDropDirection] = useState('down')
   const fontDropdownRef = useRef(null)
   const templateDropdownRef = useRef(null)
   const cvData = { personalInfo, summary, experience, education, skills, certifications }
+
+  // Calculate whether dropdown should open up or down based on viewport space
+  const calcDropDirection = (ref, dropdownHeight = 320) => {
+    if (!ref.current) return 'down'
+    const rect = ref.current.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - rect.bottom
+    const spaceAbove = rect.top
+    return spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? 'up' : 'down'
+  }
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -264,7 +275,7 @@ ${fontLinks}
               </div>
               <div ref={templateDropdownRef} style={{ position: 'relative' }}>
                 <button
-                  onClick={() => { setTemplateDropdownOpen(!templateDropdownOpen); setFontDropdownOpen(false) }}
+                  onClick={() => { const next = !templateDropdownOpen; if (next) setTemplateDropDirection(calcDropDirection(templateDropdownRef, 260)); setTemplateDropdownOpen(next); setFontDropdownOpen(false) }}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '10px 14px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
@@ -283,14 +294,15 @@ ${fontLinks}
                 <AnimatePresence>
                   {templateDropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                      initial={{ opacity: 0, y: templateDropDirection === 'down' ? -8 : 8, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      exit={{ opacity: 0, y: templateDropDirection === 'down' ? -8 : 8, scale: 0.97 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
                       style={{
-                        position: 'absolute', top: '100%', left: 0, right: 0,
-                        marginTop: 6, background: 'white', borderRadius: 14,
-                        border: '1px solid #e2e8f0', boxShadow: '0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
+                        position: 'absolute', left: 0, right: 0,
+                        ...(templateDropDirection === 'down' ? { top: '100%', marginTop: 6 } : { bottom: '100%', marginBottom: 6 }),
+                        background: 'white', borderRadius: 14,
+                        border: '1px solid #e2e8f0', boxShadow: templateDropDirection === 'down' ? '0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)' : '0 -8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
                         zIndex: 50, padding: '6px',
                       }}
                     >
@@ -329,7 +341,7 @@ ${fontLinks}
               </div>
               <div ref={fontDropdownRef} style={{ position: 'relative' }}>
                 <button
-                  onClick={() => { setFontDropdownOpen(!fontDropdownOpen); setTemplateDropdownOpen(false) }}
+                  onClick={() => { const next = !fontDropdownOpen; if (next) setFontDropDirection(calcDropDirection(fontDropdownRef, 340)); setFontDropdownOpen(next); setTemplateDropdownOpen(false) }}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '10px 14px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
@@ -348,14 +360,15 @@ ${fontLinks}
                 <AnimatePresence>
                   {fontDropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                      initial={{ opacity: 0, y: fontDropDirection === 'down' ? -8 : 8, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      exit={{ opacity: 0, y: fontDropDirection === 'down' ? -8 : 8, scale: 0.97 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
                       style={{
-                        position: 'absolute', top: '100%', left: 0, right: 0,
-                        marginTop: 6, background: 'white', borderRadius: 14,
-                        border: '1px solid #e2e8f0', boxShadow: '0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
+                        position: 'absolute', left: 0, right: 0,
+                        ...(fontDropDirection === 'down' ? { top: '100%', marginTop: 6 } : { bottom: '100%', marginBottom: 6 }),
+                        background: 'white', borderRadius: 14,
+                        border: '1px solid #e2e8f0', boxShadow: fontDropDirection === 'down' ? '0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)' : '0 -8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)',
                         maxHeight: 320, overflowY: 'auto', zIndex: 50, padding: '6px',
                       }}
                     >
@@ -434,7 +447,7 @@ ${fontLinks}
               <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #e2e8f0' }}>
                 {[
                   { id: 'id', label: '🇮🇩 Indonesia' },
-                  { id: 'en', label: '🇬🇧 English' },
+                  { id: 'en', label: 'EN English' },
                 ].map((opt) => {
                   const isActive = cvLanguage === opt.id
                   return (
