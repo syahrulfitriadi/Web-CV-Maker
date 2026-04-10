@@ -447,7 +447,7 @@ ${fontLinks}
               <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #e2e8f0' }}>
                 {[
                   { id: 'id', label: '🇮🇩 Indonesia' },
-                  { id: 'en', label: 'EN English' },
+                  { id: 'en', label: 'en English' },
                 ].map((opt) => {
                   const isActive = cvLanguage === opt.id
                   return (
