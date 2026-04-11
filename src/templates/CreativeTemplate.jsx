@@ -70,7 +70,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
       {/* ═══════ HERO HEADER ═══════ */}
       <header style={{
         background: `linear-gradient(135deg, ${tcDark} 0%, ${tc} 50%, ${lightenColor(tc, 0.15)} 100%)`,
-        padding: '28px 36px 24px',
+        padding: '36px 36px 32px',
         display: 'flex', alignItems: 'center', gap: 24,
         position: 'relative', overflow: 'hidden', flexShrink: 0,
       }}>
@@ -125,7 +125,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           <p style={{
             fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
             letterSpacing: '0.15em', textTransform: 'uppercase',
-            margin: '6px 0 10px', fontFamily: hf,
+            margin: '10px 0 16px', fontFamily: hf,
           }}>
             {personalInfo.title || t.jobTitle}
           </p>
@@ -133,15 +133,15 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           {/* Contact row */}
           {contactItems.length > 0 && (
             <div style={{
-              display: 'flex', flexWrap: 'wrap', gap: 10,
-              fontSize: '8pt',
+              display: 'flex', flexWrap: 'wrap', gap: 8,
+              fontSize: '8.5pt',
             }}>
               {contactItems.map((item, i) => (
                 <span key={i} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
                   color: 'rgba(255,255,255,0.9)', fontWeight: 600,
                   background: 'rgba(255,255,255,0.18)',
-                  padding: '2px 8px', borderRadius: 6,
+                  padding: '4px 10px', borderRadius: 6,
                 }}>
                   <span style={{ fontSize: 10, opacity: 0.8 }}>{item.icon}</span>
                   {item.val}
@@ -158,8 +158,8 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
       }}>
         {/* LEFT COLUMN — 60% */}
         <div style={{
-          width: '60%', padding: '22px 24px 24px 36px',
-          display: 'flex', flexDirection: 'column', gap: 18,
+          width: '60%', padding: '30px 24px 36px 36px',
+          display: 'flex', flexDirection: 'column', gap: 26,
           overflow: 'hidden',
         }}>
 
@@ -168,8 +168,8 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
             <section>
               <CreativeHeading text={t.profileSummary} color={tc} font={hf} />
               <p style={{
-                fontSize: '9.5pt', lineHeight: 1.75, color: '#374151',
-                margin: '8px 0 0', textAlign: 'justify',
+                fontSize: '9.5pt', lineHeight: 1.9, color: '#374151',
+                margin: '12px 0 0', textAlign: 'justify',
                 paddingLeft: 12, borderLeft: `3px solid ${hexToRgba(tc, 0.2)}`,
               }}>
                 {summary}
@@ -181,10 +181,10 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           {experience.some(e => e.company || e.role) && (
             <section>
               <CreativeHeading text={t.workExperience} color={tc} font={hf} />
-              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {experience.filter(e => e.company || e.role).map((exp, i) => (
                   <div key={i} style={{
-                    padding: '10px 14px',
+                    padding: '14px 14px',
                     borderRadius: 10,
                     background: hexToRgba(tc, 0.03),
                     borderLeft: `4px solid ${tc}`,
@@ -210,7 +210,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
                       )}
                     </div>
                     <p style={{
-                      fontSize: '8.5pt', color: '#64748b', margin: '2px 0 6px',
+                      fontSize: '8.5pt', color: '#64748b', margin: '4px 0 10px',
                       fontStyle: 'italic',
                     }}>
                       {exp.company && exp.role ? exp.company : ''}
@@ -219,11 +219,11 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
                     </p>
                     <ul style={{
                       listStyleType: 'none', margin: 0, padding: 0,
-                      display: 'flex', flexDirection: 'column', gap: 3,
+                      display: 'flex', flexDirection: 'column', gap: 6,
                     }}>
                       {exp.bullets?.filter(b => b).map((b, j) => (
                         <li key={j} style={{
-                          fontSize: '8.5pt', lineHeight: 1.55, color: '#374151',
+                          fontSize: '8.5pt', lineHeight: 1.75, color: '#374151',
                           display: 'flex', alignItems: 'flex-start', gap: 6,
                         }}>
                           <span style={{
@@ -245,7 +245,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           {certifications.some(c => c) && (
             <section>
               <CreativeHeading text={t.certifications} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
                 {certifications.filter(c => c).map((cert, i) => (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
@@ -269,10 +269,10 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
 
         {/* RIGHT COLUMN — 40% */}
         <div style={{
-          width: '40%', padding: '22px 36px 24px 16px',
+          width: '40%', padding: '30px 36px 36px 16px',
           background: hexToRgba(tc, 0.03),
           borderLeft: `1px solid ${hexToRgba(tc, 0.08)}`,
-          display: 'flex', flexDirection: 'column', gap: 18,
+          display: 'flex', flexDirection: 'column', gap: 26,
           overflow: 'hidden',
         }}>
 
@@ -280,15 +280,15 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           {skills.hard.some(s => s) && (
             <section>
               <CreativeHeading text={t.hardSkill || 'Hard Skills'} color={tc} font={hf} />
-              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {skills.hard.filter(s => s).map((s, i) => (
                   <div key={i}>
-                    <span style={{ fontSize: '8.5pt', fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>
+                    <span style={{ fontSize: '8.5pt', fontWeight: 600, color: '#334155', display: 'block', marginBottom: 4 }}>
                       {s}
                     </span>
                     {/* Visual bar */}
                     <div style={{
-                      height: 5, borderRadius: 3,
+                      height: 6, borderRadius: 3,
                       background: hexToRgba(tc, 0.12),
                       overflow: 'hidden',
                     }}>
@@ -308,10 +308,10 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           {skills.soft.some(s => s) && (
             <section>
               <CreativeHeading text={t.softSkill || 'Soft Skills'} color={tc} font={hf} />
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginTop: 10 }}>
                 {skills.soft.filter(s => s).map((s, i) => (
                   <span key={i} style={{
-                    display: 'inline-block', padding: '3px 10px',
+                    display: 'inline-block', padding: '5px 12px',
                     background: hexToRgba(tc, 0.08),
                     color: tcDark, borderRadius: 20,
                     fontSize: '7.5pt', fontWeight: 600,
@@ -328,10 +328,10 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
           {education.some(e => e.institution) && (
             <section>
               <CreativeHeading text={t.education} color={tc} font={hf} />
-              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {education.filter(e => e.institution).map((edu, i) => (
                   <div key={i} style={{
-                    paddingLeft: 10,
+                    paddingLeft: 10, paddingTop: 4, paddingBottom: 4,
                     borderLeft: `3px solid ${hexToRgba(tc, 0.3)}`,
                   }}>
                     <p style={{
@@ -340,11 +340,11 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
                     }}>
                       {edu.institution}
                     </p>
-                    <p style={{ fontSize: '8pt', color: '#475569', margin: '0 0 1px' }}>
+                    <p style={{ fontSize: '8pt', color: '#475569', margin: '0 0 3px' }}>
                       {edu.degree}{edu.field ? `${t.degreeOf}${edu.field}` : ''}
                     </p>
                     {edu.gpa && (
-                      <p style={{ fontSize: '7.5pt', color: '#64748b', margin: '0 0 1px' }}>
+                      <p style={{ fontSize: '7.5pt', color: '#64748b', margin: '0 0 3px' }}>
                         {t.gpaLabel} {edu.gpa}
                       </p>
                     )}
@@ -363,7 +363,7 @@ export default function CreativeTemplate({ data, themeColor = '#6366f1', fontFam
 
       {/* Bottom accent bar */}
       <div style={{
-        height: 5, flexShrink: 0,
+        height: 6, flexShrink: 0,
         background: `linear-gradient(90deg, ${tcDark}, ${tc}, ${lightenColor(tc, 0.2)})`,
       }} />
     </div>
@@ -375,7 +375,7 @@ function CreativeHeading({ text, color, font }) {
   return (
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: 6,
-      marginBottom: 2,
+      marginBottom: 6,
     }}>
       <div style={{
         width: 4, height: 16, borderRadius: 2,
