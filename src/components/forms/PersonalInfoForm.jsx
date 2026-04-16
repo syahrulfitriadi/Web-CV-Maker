@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useCVStore } from '../../store/useCVStore'
 import { getPhotoStyle } from '../../utils/photoStyle'
-import { User, Mail, Phone, MapPin, Globe, Link2, Camera, ZoomIn, ZoomOut, Move, X, Check, RotateCcw } from 'lucide-react'
+import { processProfilePhoto } from '../../lib/imageService'
+import { User, Mail, Phone, MapPin, Globe, Link2, Camera, ZoomIn, ZoomOut, Move, X, Check, RotateCcw, Loader2, AlertCircle } from 'lucide-react'
 
 const fields = [
   { key: 'name', label: 'Nama Lengkap', icon: User, placeholder: 'John Doe', type: 'text' },
@@ -22,7 +23,50 @@ const inputStyle = {
 export default function PersonalInfoForm() {
   const { personalInfo, setPersonalInfo, setPhoto, setPhotoCrop, summary, setSummary } = useCVStore()
   const [showCropEditor, setShowCropEditor] = useState(false)
+  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false)
+  const [photoError, setPhotoError] = useState(null)
+  const [photoMeta, setPhotoMeta] = useState(null) // compression stats
   const crop = personalInfo.photoCrop || { scale: 1, posX: 50, posY: 20 }
+
+  // Auto-clear photo error after 5 seconds
+  useEffect(() => {
+    if (photoError) {
+      const timer = setTimeout(() => setPhotoError(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [photoError])
+
+  // Auto-clear photo meta after 4 seconds
+  useEffect(() => {
+    if (photoMeta) {
+      const timer = setTimeout(() => setPhotoMeta(null), 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [photoMeta])
+
+  const handlePhotoSelect = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Reset input value so the same file can be re-selected
+    e.target.value = ''
+
+    setIsProcessingPhoto(true)
+    setPhotoError(null)
+    setPhotoMeta(null)
+
+    const result = await processProfilePhoto(file)
+
+    if (result.error) {
+      setPhotoError(result.error)
+      setIsProcessingPhoto(false)
+      return
+    }
+
+    setPhoto(result.file, result.preview)
+    setPhotoMeta(result.meta)
+    setIsProcessingPhoto(false)
+  }
 
   return (
     <div>
@@ -51,19 +95,58 @@ export default function PersonalInfoForm() {
               <Camera style={{ width: 40, height: 40, color: '#94a3b8' }} />
             )}
           </div>
-          {!personalInfo.photoPreview && (
-            <input type="file" accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0])}
+          {!personalInfo.photoPreview && !isProcessingPhoto && (
+            <input type="file" accept="image/jpeg,image/png,image/webp"
+              onChange={handlePhotoSelect}
               style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
             />
+          )}
+          {/* Processing overlay */}
+          {isProcessingPhoto && (
+            <div style={{
+              position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.85)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              borderRadius: 16, zIndex: 2,
+            }}>
+              <Loader2 style={{ width: 28, height: 28, color: '#0ea5e9', animation: 'spin 1s linear infinite' }} />
+              <span style={{ fontSize: 11, color: '#64748b', marginTop: 6, fontWeight: 500 }}>Memproses...</span>
+            </div>
           )}
         </div>
 
         <div style={{ flex: 1 }}>
           <p style={{ fontWeight: 600, color: '#334155', fontSize: 15, marginBottom: 4 }}>Foto Profil</p>
           <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>
-            {personalInfo.photoPreview ? 'Klik "Atur Foto" untuk atur posisi dan zoom' : 'Klik area foto untuk upload. JPG, PNG (maks. 2MB)'}
+            {isProcessingPhoto
+              ? 'Mengompres gambar...'
+              : personalInfo.photoPreview
+                ? 'Klik "Atur Foto" untuk atur posisi dan zoom'
+                : 'Klik area foto untuk upload. JPG, PNG, WebP (maks. 10MB)'}
           </p>
+
+          {/* Photo error message */}
+          {photoError && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
+              borderRadius: 8, background: '#fef2f2', border: '1px solid #fecaca',
+              fontSize: 12, color: '#dc2626', marginBottom: 10, fontWeight: 500,
+            }}>
+              <AlertCircle style={{ width: 14, height: 14, flexShrink: 0 }} />
+              {photoError}
+            </div>
+          )}
+
+          {/* Compression success stats */}
+          {photoMeta && !photoError && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
+              borderRadius: 8, background: '#f0fdf4', border: '1px solid #bbf7d0',
+              fontSize: 12, color: '#16a34a', marginBottom: 10, fontWeight: 500,
+            }}>
+              <Check style={{ width: 14, height: 14, flexShrink: 0 }} />
+              Dikompres: {photoMeta.originalSize}KB → {photoMeta.compressedSize}KB ({photoMeta.reduction}% lebih kecil)
+            </div>
+          )}
           {personalInfo.photoPreview && (
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button onClick={() => setShowCropEditor(true)}
@@ -81,7 +164,7 @@ export default function PersonalInfoForm() {
                 color: '#16a34a', fontSize: 12, fontWeight: 600, cursor: 'pointer',
               }}>
                 <Camera style={{ width: 13, height: 13 }} /> Ganti
-                <input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files[0])} style={{ display: 'none' }} />
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelect} style={{ display: 'none' }} />
               </label>
               <button onClick={() => { setPersonalInfo('photo', null); setPersonalInfo('photoPreview', null); setPhotoCrop({ scale: 1.2, posX: 50, posY: 20 }); }}
                 style={{

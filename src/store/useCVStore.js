@@ -74,20 +74,16 @@ export const useCVStore = create((set, get) => ({
       personalInfo: { ...state.personalInfo, [field]: value },
     })),
 
-  setPhoto: (file) => {
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        set((state) => ({
-          personalInfo: {
-            ...state.personalInfo,
-            photo: file,
-            photoPreview: reader.result,
-            photoCrop: { scale: 1.2, posX: 50, posY: 20 },
-          },
-        }))
-      }
-      reader.readAsDataURL(file)
+  setPhoto: (file, preview) => {
+    if (file && preview) {
+      set((state) => ({
+        personalInfo: {
+          ...state.personalInfo,
+          photo: file,
+          photoPreview: preview,
+          photoCrop: { scale: 1.2, posX: 50, posY: 20 },
+        },
+      }))
     }
   },
 

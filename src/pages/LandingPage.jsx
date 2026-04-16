@@ -246,7 +246,7 @@ export default function LandingPage() {
       </section>
 
       <footer style={{ padding: '24px 0', borderTop: '1px solid #e2e8f0', textAlign: 'center', fontSize: 14, color: '#94a3b8' }}>
-        © 2026 CV Builder Wizard. Dibuat dengan ❤️
+        © 2026 CV Builder. Made with ❤️ by Backtoroot Project
       </footer>
     </div>
   )
