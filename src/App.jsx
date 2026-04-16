@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCVStore } from './store/useCVStore'
+import { useAuthStore } from './store/useAuthStore'
 import Navbar from './components/Navbar'
+import AuthModal from './components/AuthModal'
 import LandingPage from './pages/LandingPage'
 import TemplateSelection from './pages/TemplateSelection'
 import FormWizard from './pages/FormWizard'
 import PreviewPage from './pages/PreviewPage'
+import DashboardPage from './pages/DashboardPage'
 
 const pageVariants = {
   initial: { opacity: 0, y: 30 },
@@ -15,6 +18,15 @@ const pageVariants = {
 
 function App() {
   const currentStep = useCVStore((s) => s.currentStep)
+  const initialize = useAuthStore((s) => s.initialize)
+
+  // Initialize auth listener on mount (non-blocking)
+  useEffect(() => {
+    const unsubscribe = initialize()
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe()
+    }
+  }, [])
 
   const renderStep = () => {
     switch (currentStep) {
@@ -26,6 +38,8 @@ function App() {
         return <FormWizard key="form" />
       case 3:
         return <PreviewPage key="preview" />
+      case 4:
+        return <DashboardPage key="dashboard" />
       default:
         return <LandingPage key="landing" />
     }
@@ -45,6 +59,9 @@ function App() {
           {renderStep()}
         </motion.div>
       </AnimatePresence>
+
+      {/* Global Auth Modal — can be triggered from anywhere */}
+      <AuthModal />
     </div>
   )
 }

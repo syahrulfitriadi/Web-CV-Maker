@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
-import { ArrowRight, Sparkles, Zap, Download, Palette, FileText, Shield, Layout, Star } from 'lucide-react'
+import { useAuthStore } from '../store/useAuthStore'
+import { ArrowRight, Sparkles, Zap, Download, Palette, FileText, Shield, Layout, Star, CloudUpload, FolderOpen } from 'lucide-react'
 
 const features = [
   { icon: Layout, title: 'Template Profesional', desc: 'Pilih dari template CV yang didesain profesional dan siap pakai.', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
   { icon: Zap, title: 'Proses Cepat', desc: 'Buat CV lengkap hanya dalam beberapa menit dengan wizard interaktif.', gradient: 'linear-gradient(135deg, #f59e0b, #ef4444)' },
   { icon: Palette, title: 'Kustomisasi Warna', desc: 'Sesuaikan warna tema dan font sesuai kepribadian Anda.', gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)' },
-  { icon: Download, title: 'Download PDF', desc: 'Unduh CV Anda dalam format PDF berkualitas tinggi.', gradient: 'linear-gradient(135deg, #10b981, #14b8a6)' },
+  { icon: CloudUpload, title: 'Simpan ke Cloud', desc: 'Login untuk menyimpan CV ke cloud dan edit kapan saja dari perangkat manapun.', gradient: 'linear-gradient(135deg, #10b981, #14b8a6)' },
 ]
 
 const containerVariants = {
@@ -20,6 +21,7 @@ const itemVariants = {
 
 export default function LandingPage() {
   const setCurrentStep = useCVStore((s) => s.setCurrentStep)
+  const user = useAuthStore((s) => s.user)
 
   return (
     <div style={{ paddingTop: 64 }}>
@@ -70,6 +72,23 @@ export default function LandingPage() {
                   <ArrowRight style={{ width: 20, height: 20 }} />
                 </motion.button>
               </motion.div>
+
+              {/* Secondary CTA for logged-in users */}
+              {user && (
+                <motion.div variants={itemVariants} style={{ marginTop: 12 }}>
+                  <button
+                    onClick={() => setCurrentStep(4)}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 8,
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 14, color: '#0ea5e9', fontWeight: 600,
+                    }}
+                  >
+                    <FolderOpen style={{ width: 16, height: 16 }} />
+                    Lihat CV tersimpan →
+                  </button>
+                </motion.div>
+              )}
 
               <motion.div variants={itemVariants}
                 style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 28, fontSize: 13, color: '#94a3b8' }}

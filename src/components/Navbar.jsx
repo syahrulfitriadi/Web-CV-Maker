@@ -1,10 +1,19 @@
 import { useCVStore } from '../store/useCVStore'
+import { useAuthStore } from '../store/useAuthStore'
 import { FileText, RotateCcw, Zap } from 'lucide-react'
+import UserMenu from './UserMenu'
 
 const steps = ['Beranda', 'Template', 'Isi Data', 'Preview']
 
 export default function Navbar() {
   const { currentStep, setCurrentStep, resetCV, fillDummyData } = useCVStore()
+  const { user } = useAuthStore()
+
+  const handleOpenDashboard = () => {
+    if (user) {
+      setCurrentStep(4) // Dashboard step
+    }
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass" style={{ borderBottom: '1px solid #e2e8f0' }}>
@@ -24,7 +33,7 @@ export default function Navbar() {
           </button>
 
           {/* Step Indicators */}
-          {currentStep > 0 && (
+          {currentStep > 0 && currentStep <= 3 && (
             <div className="hidden sm:flex items-center" style={{ gap: 4 }}>
               {steps.slice(1).map((step, index) => {
                 const stepNum = index + 1
@@ -79,7 +88,21 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Dev + Reset buttons */}
+          {/* Dashboard title */}
+          {currentStep === 4 && (
+            <div className="hidden sm:flex items-center">
+              <span style={{
+                padding: '7px 16px', borderRadius: 50,
+                fontSize: 13, fontWeight: 600,
+                background: '#0ea5e9', color: 'white',
+                boxShadow: '0 4px 14px rgba(14,165,233,0.35)',
+              }}>
+                📁 CV Saya
+              </span>
+            </div>
+          )}
+
+          {/* Right side: Dev + Reset + Auth */}
           <div className="flex items-center gap-2">
             {/* DEV ONLY: Auto Fill — hapus saat production */}
             <button
@@ -97,7 +120,7 @@ export default function Navbar() {
               Dev Fill
             </button>
 
-            {currentStep > 0 && (
+            {currentStep > 0 && currentStep <= 3 && (
               <button
                 onClick={() => { if (confirm('Reset semua data CV?')) resetCV() }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
@@ -106,6 +129,9 @@ export default function Navbar() {
                 <span className="hidden sm:inline">Reset</span>
               </button>
             )}
+
+            {/* User Menu / Login Button */}
+            <UserMenu onOpenDashboard={handleOpenDashboard} />
           </div>
         </div>
       </div>

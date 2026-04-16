@@ -1,13 +1,14 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
+import { useAuthStore } from '../store/useAuthStore'
 import ClassicTemplate from '../templates/ClassicTemplate'
 import ModernTemplate from '../templates/ModernTemplate'
 import MinimalistTemplate from '../templates/MinimalistTemplate'
 import CreativeTemplate from '../templates/CreativeTemplate'
 import ExecutiveTemplate from '../templates/ExecutiveTemplate'
 import { FONT_OPTIONS, migrateFontId } from '../utils/fonts'
-import { Download, Palette, Type, ArrowLeft, Check, Loader2, FileText, Languages, ChevronDown, Layout } from 'lucide-react'
+import { Download, Palette, Type, ArrowLeft, Check, Loader2, FileText, Languages, ChevronDown, Layout, CloudUpload, CheckCircle2, AlertCircle } from 'lucide-react'
 
 const themeColors = [
   { name: 'Sky Blue', value: '#0ea5e9' },
@@ -35,6 +36,9 @@ export default function PreviewPage() {
     setSelectedTemplate, setCurrentStep, cvLanguage, setCvLanguage,
   } = useCVStore()
 
+  const { user, openAuthModal } = useAuthStore()
+  const { saveToCloud, isSaving, lastSavedAt } = useCVStore()
+
   const previewRef = useRef(null)
   const [isExporting, setIsExporting] = useState(false)
   const [contentHeight, setContentHeight] = useState(1123)
@@ -43,9 +47,34 @@ export default function PreviewPage() {
   const [templateDropdownOpen, setTemplateDropdownOpen] = useState(false)
   const [fontDropDirection, setFontDropDirection] = useState('down')
   const [templateDropDirection, setTemplateDropDirection] = useState('down')
+  const [saveStatus, setSaveStatus] = useState(null) // null | 'success' | 'error'
   const fontDropdownRef = useRef(null)
   const templateDropdownRef = useRef(null)
   const cvData = { personalInfo, summary, experience, education, skills, certifications }
+
+  // Auto-clear save status after 3 seconds
+  useEffect(() => {
+    if (saveStatus) {
+      const timer = setTimeout(() => setSaveStatus(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [saveStatus])
+
+  const handleSaveToCloud = async () => {
+    const doSave = async (currentUser) => {
+      const result = await saveToCloud(currentUser.id)
+      setSaveStatus(result.success ? 'success' : 'error')
+    }
+
+    if (!user) {
+      // Not logged in → open auth modal with callback
+      openAuthModal(async (newUser) => {
+        await doSave(newUser)
+      })
+    } else {
+      await doSave(user)
+    }
+  }
 
   // Calculate whether dropdown should open up or down based on viewport space
   const calcDropDirection = (ref, dropdownHeight = 320) => {
@@ -215,12 +244,40 @@ ${fontLinks}
             <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a' }}>Preview CV</h1>
             <p style={{ fontSize: 14, color: '#64748b' }}>Lihat hasilnya dan sesuaikan warna tema</p>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button onClick={() => setCurrentStep(2)}
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 12, background: 'white', color: '#475569', fontWeight: 500, fontSize: 14, border: '1px solid #e2e8f0', cursor: 'pointer' }}
             >
               <ArrowLeft style={{ width: 16, height: 16 }} /> Edit Data
             </button>
+
+            {/* Save to Cloud */}
+            <motion.button whileHover={isSaving ? {} : { scale: 1.03 }} whileTap={isSaving ? {} : { scale: 0.97 }}
+              onClick={handleSaveToCloud}
+              disabled={isSaving}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12,
+                background: saveStatus === 'success' ? '#10b981' : saveStatus === 'error' ? '#ef4444' : 'white',
+                color: saveStatus ? 'white' : '#374151',
+                fontWeight: 600, fontSize: 14,
+                border: saveStatus ? 'none' : '1.5px solid #e2e8f0',
+                cursor: isSaving ? 'wait' : 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: saveStatus === 'success' ? '0 4px 14px rgba(16,185,129,0.3)' : 'none',
+              }}
+            >
+              {isSaving ? (
+                <><Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} /> Menyimpan...</>
+              ) : saveStatus === 'success' ? (
+                <><CheckCircle2 style={{ width: 16, height: 16 }} /> Tersimpan!</>
+              ) : saveStatus === 'error' ? (
+                <><AlertCircle style={{ width: 16, height: 16 }} /> Gagal</>
+              ) : (
+                <><CloudUpload style={{ width: 16, height: 16 }} /> Simpan ke Cloud</>
+              )}
+            </motion.button>
+
+            {/* Download PDF */}
             <motion.button whileHover={isExporting ? {} : { scale: 1.03 }} whileTap={isExporting ? {} : { scale: 0.97 }}
               onClick={handleDownload}
               disabled={isExporting}

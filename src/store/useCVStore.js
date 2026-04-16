@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { getDummyData } from '../utils/dummyData'
+import { createResume, updateResume } from '../lib/resumeService'
+import { uploadPhoto, getPhotoUrl } from '../lib/storageService'
 
 const defaultCV = {
   personalInfo: {
@@ -50,6 +52,12 @@ const defaultCV = {
   cvLanguage: 'id',
   currentStep: 0,
   _isDummyFilled: false,
+  // Cloud sync state
+  resumeId: null,       // ID of resume in Supabase (null = not saved yet)
+  photoPath: null,      // Path of photo in Supabase Storage
+  isSaving: false,
+  saveError: null,
+  lastSavedAt: null,
 }
 
 export const useCVStore = create((set, get) => ({
@@ -260,6 +268,93 @@ export const useCVStore = create((set, get) => ({
     })
   },
 
+  // Cloud actions
+  setResumeId: (id) => set({ resumeId: id }),
+
+  saveToCloud: async (userId) => {
+    const state = get()
+    set({ isSaving: true, saveError: null })
+
+    try {
+      let photoPath = state.photoPath
+
+      // Upload photo to Supabase Storage if there's a new local file
+      if (state.personalInfo.photo && state.personalInfo.photo instanceof File) {
+        const result = await uploadPhoto(userId, state.personalInfo.photo)
+        photoPath = result.path
+        set({ photoPath })
+      }
+
+      const resumeData = {
+        title: state.personalInfo.name || `CV ${new Date().toLocaleDateString('id-ID')}`,
+        selectedTemplate: state.selectedTemplate,
+        themeColor: state.themeColor,
+        fontFamily: state.fontFamily,
+        cvLanguage: state.cvLanguage,
+        photoPath,
+        personalInfo: state.personalInfo,
+        summary: state.summary,
+        experience: state.experience,
+        education: state.education,
+        skills: state.skills,
+        certifications: state.certifications,
+      }
+
+      let savedResume
+      if (state.resumeId) {
+        // Update existing
+        savedResume = await updateResume(state.resumeId, resumeData)
+      } else {
+        // Create new
+        savedResume = await createResume(userId, resumeData)
+      }
+
+      set({
+        resumeId: savedResume.id,
+        isSaving: false,
+        lastSavedAt: new Date().toISOString(),
+      })
+
+      return { success: true, resumeId: savedResume.id }
+    } catch (err) {
+      set({ isSaving: false, saveError: err.message })
+      return { success: false, error: err.message }
+    }
+  },
+
+  loadFromCloud: (resume) => {
+    const content = resume.content || {}
+    const personalInfo = content.personalInfo || defaultCV.personalInfo
+
+    // If there's a photo stored in Supabase Storage, get its public URL
+    let photoPreview = null
+    if (resume.photo_path) {
+      photoPreview = getPhotoUrl(resume.photo_path)
+    }
+
+    set({
+      resumeId: resume.id,
+      selectedTemplate: resume.template_id || 'classic',
+      themeColor: resume.theme_color || '#0ea5e9',
+      fontFamily: resume.font_family || 'inter',
+      cvLanguage: resume.cv_language || 'id',
+      photoPath: resume.photo_path || null,
+      personalInfo: {
+        ...defaultCV.personalInfo,
+        ...personalInfo,
+        photo: null, // File objects can't be stored, will be null
+        photoPreview: photoPreview,
+      },
+      summary: content.summary || '',
+      experience: content.experience || defaultCV.experience,
+      education: content.education || defaultCV.education,
+      skills: content.skills || defaultCV.skills,
+      certifications: content.certifications || defaultCV.certifications,
+      _isDummyFilled: false,
+      lastSavedAt: resume.updated_at,
+    })
+  },
+
   // Reset
-  resetCV: () => set({ ...defaultCV, _isDummyFilled: false, currentStep: 0 }),
+  resetCV: () => set({ ...defaultCV, _isDummyFilled: false, currentStep: 0, resumeId: null, photoPath: null, isSaving: false, saveError: null, lastSavedAt: null }),
 }))
