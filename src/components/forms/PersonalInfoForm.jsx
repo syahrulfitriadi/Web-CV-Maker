@@ -47,15 +47,29 @@ export default function PersonalInfoForm() {
   }, [photoMeta])
 
   const handlePhotoSelect = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // Reset input value so the same file can be re-selected
-    e.target.value = ''
+    const originalFile = e.target.files?.[0]
+    if (!originalFile) return
 
     setIsProcessingPhoto(true)
     setPhotoError(null)
     setPhotoMeta(null)
+
+    // Create a safe copy of the file BEFORE resetting the input.
+    // On mobile browsers, resetting e.target.value can release the file blob.
+    let file
+    try {
+      const arrayBuffer = await originalFile.arrayBuffer()
+      file = new File([arrayBuffer], originalFile.name || 'photo.jpg', {
+        type: originalFile.type || 'image/jpeg',
+        lastModified: originalFile.lastModified,
+      })
+    } catch {
+      // If arrayBuffer fails, try with Blob as fallback
+      file = originalFile
+    }
+
+    // Now safe to reset input so the same file can be re-selected
+    e.target.value = ''
 
     const result = await processProfilePhoto(file)
 

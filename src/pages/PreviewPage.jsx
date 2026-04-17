@@ -149,116 +149,25 @@ export default function PreviewPage() {
     setIsExporting(true)
 
     try {
-      if (isMobileDevice()) {
-        // ========== MOBILE: html2canvas + jsPDF ==========
-        const [html2canvasModule, jsPDFModule] = await Promise.all([
-          import('html2canvas'),
-          import('jspdf'),
-        ])
-        const html2canvas = html2canvasModule.default
-        const { jsPDF } = jsPDFModule
+      // Wait for fonts to be loaded in the main document
+      if (document.fonts?.ready) await document.fonts.ready
 
-        // Wait for fonts to be loaded
-        if (document.fonts?.ready) await document.fonts.ready
+      // Collect all font-related link tags (preconnect + stylesheet)
+      const fontLinks = Array.from(
+        document.querySelectorAll('link[rel="preconnect"], link[href*="fonts.googleapis.com"]')
+      ).map(l => l.outerHTML).join('\n')
 
-        // Temporarily remove CSS transform so html2canvas captures at full size
-        const origTransform = element.style.transform
-        const origTransformOrigin = element.style.transformOrigin
-        const origMarginBottom = element.style.marginBottom
-        const origMarginRight = element.style.marginRight
-        const origPointerEvents = element.style.pointerEvents
-        const origMaxHeight = element.style.maxHeight
+      // Get the CV content HTML (all React inline styles are preserved)
+      const cvContent = element.innerHTML
 
-        element.style.transform = 'none'
-        element.style.transformOrigin = 'top left'
-        element.style.marginBottom = '0'
-        element.style.marginRight = '0'
-        element.style.pointerEvents = 'auto'
-        element.style.maxHeight = 'none'
+      // Calculate page dimensions based on mode
+      const PX_TO_MM = 0.2646 // 1px at 96dpi ≈ 0.2646mm
+      const isA4 = pdfSizeMode === 'a4'
+      const pageHeightPx = isA4 ? 1123 : contentHeight
+      const pageHeightMm = isA4 ? 297 : Math.min(Math.ceil(contentHeight * PX_TO_MM) + 1, 297)
 
-        // Small delay to let browser re-layout
-        await new Promise(r => setTimeout(r, 100))
-
-        // Get actual content dimensions at full scale
-        const actualWidth = element.scrollWidth
-        const actualHeight = element.scrollHeight
-
-        // Render the CV element to canvas at full size
-        const canvas = await html2canvas(element, {
-          scale: 2, // High quality
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          width: actualWidth,
-          height: Math.min(actualHeight, 1123),
-          windowWidth: actualWidth,
-          logging: false,
-        })
-
-        // Restore original styles
-        element.style.transform = origTransform
-        element.style.transformOrigin = origTransformOrigin
-        element.style.marginBottom = origMarginBottom
-        element.style.marginRight = origMarginRight
-        element.style.pointerEvents = origPointerEvents
-        element.style.maxHeight = origMaxHeight
-
-        // Calculate PDF dimensions — maintain aspect ratio
-        const isA4 = pdfSizeMode === 'a4'
-        const pdfWidth = 210 // A4 width in mm
-        const canvasRatio = canvas.height / canvas.width
-        const pdfHeight = isA4 ? 297 : Math.min(Math.round(pdfWidth * canvasRatio), 297)
-
-        // Create PDF
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: [pdfWidth, pdfHeight],
-        })
-
-        const imgData = canvas.toDataURL('image/jpeg', 0.95)
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight)
-
-        // Generate filename
-        const fileName = `CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}.pdf`
-
-        // Download using Blob + link (works reliably on mobile)
-        const pdfBlob = pdf.output('blob')
-        const url = URL.createObjectURL(pdfBlob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = fileName
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        link.click()
-
-        // Cleanup
-        setTimeout(() => {
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-        }, 100)
-
-      } else {
-        // ========== DESKTOP: window.open + print (original method) ==========
-        // Wait for fonts to be loaded in the main document
-        if (document.fonts?.ready) await document.fonts.ready
-
-        // Collect all font-related link tags (preconnect + stylesheet)
-        const fontLinks = Array.from(
-          document.querySelectorAll('link[rel="preconnect"], link[href*="fonts.googleapis.com"]')
-        ).map(l => l.outerHTML).join('\n')
-
-        // Get the CV content HTML (all React inline styles are preserved)
-        const cvContent = element.innerHTML
-
-        // Calculate page dimensions based on mode
-        const PX_TO_MM = 0.2646 // 1px at 96dpi ≈ 0.2646mm
-        const isA4 = pdfSizeMode === 'a4'
-        const pageHeightPx = isA4 ? 1123 : contentHeight
-        const pageHeightMm = isA4 ? 297 : Math.min(Math.ceil(contentHeight * PX_TO_MM) + 1, 297)
-
-        // Build a print-optimized HTML document
-        const printHTML = `<!DOCTYPE html>
+      // Build a print-optimized HTML document
+      const printHTML = `<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -289,7 +198,90 @@ ${fontLinks}
 <body>${cvContent}</body>
 </html>`
 
-        // Open a new window for printing
+      if (isMobileDevice()) {
+        // ========== MOBILE: Hidden iframe + print ==========
+        // Using iframe avoids popup blockers while still using browser's
+        // native rendering engine for pixel-perfect output.
+
+        // Remove any previous print iframe
+        const existingFrame = document.getElementById('cv-print-iframe')
+        if (existingFrame) existingFrame.remove()
+
+        const iframe = document.createElement('iframe')
+        iframe.id = 'cv-print-iframe'
+        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;'
+        document.body.appendChild(iframe)
+
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+        iframeDoc.open()
+        iframeDoc.write(printHTML)
+        iframeDoc.close()
+
+        // Wait for iframe content to load
+        await new Promise(resolve => {
+          if (iframeDoc.readyState === 'complete') {
+            resolve()
+          } else {
+            iframe.addEventListener('load', resolve)
+          }
+          setTimeout(resolve, 3000) // Fallback timeout
+        })
+
+        // Wait for Google Fonts to load inside iframe
+        if (iframeDoc.fonts?.ready) {
+          try {
+            await Promise.race([
+              iframeDoc.fonts.ready,
+              new Promise(r => setTimeout(r, 3000)), // Don't wait forever
+            ])
+          } catch { /* ignore font load errors */ }
+        }
+
+        // Wait for images to load inside iframe
+        const imgs = iframeDoc.querySelectorAll('img')
+        if (imgs.length > 0) {
+          await Promise.all(
+            Array.from(imgs).map(img =>
+              img.complete && img.naturalWidth > 0
+                ? Promise.resolve()
+                : new Promise(r => { img.onload = r; img.onerror = r; setTimeout(r, 2000) })
+            )
+          )
+        }
+
+        // Extra delay for final rendering settle
+        await new Promise(r => setTimeout(r, 500))
+
+        // Trigger print from iframe
+        try {
+          iframe.contentWindow.focus()
+          iframe.contentWindow.print()
+        } catch (printErr) {
+          console.warn('Iframe print failed, trying window.print fallback:', printErr)
+          // Fallback: try opening in new window
+          const printWin = window.open('', '_blank')
+          if (printWin) {
+            printWin.document.open()
+            printWin.document.write(printHTML)
+            printWin.document.close()
+            await new Promise(r => setTimeout(r, 1500))
+            printWin.focus()
+            printWin.print()
+            printWin.addEventListener('afterprint', () => printWin.close())
+            setTimeout(() => { if (!printWin.closed) printWin.close() }, 120000)
+          } else {
+            alert('Tidak bisa membuka dialog cetak. Izinkan popup untuk situs ini.')
+          }
+        }
+
+        // Cleanup iframe after a delay
+        setTimeout(() => {
+          const frame = document.getElementById('cv-print-iframe')
+          if (frame) frame.remove()
+        }, 5000)
+
+      } else {
+        // ========== DESKTOP: window.open + print (original method) ==========
         const printWin = window.open('', '_blank')
         if (!printWin) {
           alert('Popup diblokir oleh browser. Izinkan popup untuk situs ini, lalu coba lagi.')
