@@ -182,7 +182,6 @@ export default function PreviewPage() {
           min-height: 1123px;
           background: white;
           z-index: -9999;
-          opacity: 0;
           pointer-events: none;
           overflow: visible;
         `
