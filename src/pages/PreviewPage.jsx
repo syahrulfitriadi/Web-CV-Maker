@@ -161,31 +161,63 @@ export default function PreviewPage() {
         // Wait for fonts to be loaded
         if (document.fonts?.ready) await document.fonts.ready
 
-        // Render the CV element to canvas
+        // Temporarily remove CSS transform so html2canvas captures at full size
+        const origTransform = element.style.transform
+        const origTransformOrigin = element.style.transformOrigin
+        const origMarginBottom = element.style.marginBottom
+        const origMarginRight = element.style.marginRight
+        const origPointerEvents = element.style.pointerEvents
+        const origMaxHeight = element.style.maxHeight
+
+        element.style.transform = 'none'
+        element.style.transformOrigin = 'top left'
+        element.style.marginBottom = '0'
+        element.style.marginRight = '0'
+        element.style.pointerEvents = 'auto'
+        element.style.maxHeight = 'none'
+
+        // Small delay to let browser re-layout
+        await new Promise(r => setTimeout(r, 100))
+
+        // Get actual content dimensions at full scale
+        const actualWidth = element.scrollWidth
+        const actualHeight = element.scrollHeight
+
+        // Render the CV element to canvas at full size
         const canvas = await html2canvas(element, {
           scale: 2, // High quality
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          width: 794,
-          height: Math.min(element.scrollHeight, 1123),
+          width: actualWidth,
+          height: Math.min(actualHeight, 1123),
+          windowWidth: actualWidth,
           logging: false,
         })
 
-        // Calculate PDF dimensions
+        // Restore original styles
+        element.style.transform = origTransform
+        element.style.transformOrigin = origTransformOrigin
+        element.style.marginBottom = origMarginBottom
+        element.style.marginRight = origMarginRight
+        element.style.pointerEvents = origPointerEvents
+        element.style.maxHeight = origMaxHeight
+
+        // Calculate PDF dimensions — maintain aspect ratio
         const isA4 = pdfSizeMode === 'a4'
-        const imgWidth = 210 // A4 width in mm
-        const imgHeight = isA4 ? 297 : Math.min(Math.ceil(canvas.height * 210 / canvas.width), 297)
+        const pdfWidth = 210 // A4 width in mm
+        const canvasRatio = canvas.height / canvas.width
+        const pdfHeight = isA4 ? 297 : Math.min(Math.round(pdfWidth * canvasRatio), 297)
 
         // Create PDF
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
-          format: [imgWidth, imgHeight],
+          format: [pdfWidth, pdfHeight],
         })
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95)
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight)
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight)
 
         // Generate filename
         const fileName = `CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}.pdf`
