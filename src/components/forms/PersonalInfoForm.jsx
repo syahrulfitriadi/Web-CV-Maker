@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useCVStore } from '../../store/useCVStore'
 import { getPhotoStyle } from '../../utils/photoStyle'
 import { processProfilePhoto } from '../../lib/imageService'
+import { useIsMobile } from '../../utils/useIsMobile'
 import { User, Mail, Phone, MapPin, Globe, Link2, Camera, ZoomIn, ZoomOut, Move, X, Check, RotateCcw, Loader2, AlertCircle } from 'lucide-react'
 
 const fields = [
@@ -22,6 +23,7 @@ const inputStyle = {
 
 export default function PersonalInfoForm() {
   const { personalInfo, setPersonalInfo, setPhoto, setPhotoCrop, summary, setSummary } = useCVStore()
+  const isMobile = useIsMobile()
   const [showCropEditor, setShowCropEditor] = useState(false)
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false)
   const [photoError, setPhotoError] = useState(null)
@@ -77,15 +79,17 @@ export default function PersonalInfoForm() {
 
       {/* Photo Upload */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 20, padding: 20, background: '#f8fafc',
+        display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center',
+        gap: isMobile ? 14 : 20, padding: isMobile ? 16 : 20, background: '#f8fafc',
         borderRadius: 16, border: '1.5px solid #e2e8f0', marginBottom: 24,
       }}>
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{
-            width: 120, height: 120, borderRadius: 16, overflow: 'hidden',
+            width: isMobile ? 100 : 120, height: isMobile ? 100 : 120, borderRadius: 16, overflow: 'hidden',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: personalInfo.photoPreview ? '3px solid #0ea5e9' : '2px dashed #cbd5e1',
             background: personalInfo.photoPreview ? '#111' : '#f1f5f9',
+            margin: isMobile ? '0 auto' : undefined,
           }}>
             {personalInfo.photoPreview ? (
               <img src={personalInfo.photoPreview} alt="Profile"
@@ -96,7 +100,7 @@ export default function PersonalInfoForm() {
             )}
           </div>
           {!personalInfo.photoPreview && !isProcessingPhoto && (
-            <input type="file" accept="image/jpeg,image/png,image/webp"
+            <input type="file" accept="image/*"
               onChange={handlePhotoSelect}
               style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
             />
@@ -164,7 +168,7 @@ export default function PersonalInfoForm() {
                 color: '#16a34a', fontSize: 12, fontWeight: 600, cursor: 'pointer',
               }}>
                 <Camera style={{ width: 13, height: 13 }} /> Ganti
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelect} style={{ display: 'none' }} />
+                <input type="file" accept="image/*" onChange={handlePhotoSelect} style={{ display: 'none' }} />
               </label>
               <button onClick={() => { setPersonalInfo('photo', null); setPersonalInfo('photoPreview', null); setPhotoCrop({ scale: 1.2, posX: 50, posY: 20 }); }}
                 style={{
@@ -191,7 +195,7 @@ export default function PersonalInfoForm() {
       )}
 
       {/* Fields */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
         {fields.map((field) => (
           <div key={field.key}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>

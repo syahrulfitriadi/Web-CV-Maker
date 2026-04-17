@@ -104,7 +104,7 @@ export default function Navbar() {
 
           {/* Right side: Dev + Reset + Auth */}
           <div className="flex items-center gap-2">
-            {/* DEV ONLY: Auto Fill — hapus saat production */}
+            {/* DEV ONLY: Auto Fill */}
             <button
               onClick={() => { fillDummyData(); setCurrentStep(3) }}
               style={{

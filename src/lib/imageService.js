@@ -12,9 +12,18 @@ const QUALITY = 0.9               // JPEG quality 90% — tajam, hampir identik 
  * @returns {Promise<{ file: File, preview: string } | { error: string }>}
  */
 export async function processProfilePhoto(file) {
-  // 1. Validasi tipe file
-  const validTypes = ['image/jpeg', 'image/png', 'image/webp']
-  if (!validTypes.includes(file.type)) {
+  // 1. Validasi tipe file (dengan fallback ke extension untuk mobile browser)
+  // Mobile browsers sering mengembalikan file.type kosong atau non-standard
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
+  const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif']
+
+  const fileType = (file.type || '').toLowerCase()
+  const fileName = (file.name || '').toLowerCase()
+  const hasValidType = fileType !== '' && validTypes.includes(fileType)
+  const hasValidExt = validExtensions.some(ext => fileName.endsWith(ext))
+
+  // Accept if EITHER MIME type OR file extension is valid (mobile fallback)
+  if (!hasValidType && !hasValidExt) {
     return {
       error: `Format tidak didukung (${file.type || 'unknown'}). Gunakan JPG, PNG, atau WebP.`,
     }

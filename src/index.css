@@ -88,6 +88,25 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* Mobile touch optimization */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Prevent iOS zoom on input focus */
+@media (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Form input global styling */
 input[type="text"],
 input[type="email"],

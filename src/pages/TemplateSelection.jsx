@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCVStore } from '../store/useCVStore'
+import { useIsMobile } from '../utils/useIsMobile'
 import { Check, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 
 const templates = [
@@ -38,6 +39,7 @@ const templates = [
 
 export default function TemplateSelection() {
   const { selectedTemplate, setSelectedTemplate, setCurrentStep, themeColor } = useCVStore()
+  const isMobile = useIsMobile()
 
   // Default to Minimalist (index 2) if no template selected yet
   const getInitialIndex = () => {
@@ -128,7 +130,7 @@ export default function TemplateSelection() {
     if (!isActive && !isPrev && !isNext) {
       return {
         opacity: 0,
-        transform: diff < 0 ? 'translateX(-180%) scale(0.65)' : 'translateX(180%) scale(0.65)',
+        transform: diff < 0 ? `translateX(-${isMobile ? '140' : '180'}%) scale(0.65)` : `translateX(${isMobile ? '140' : '180'}%) scale(0.65)`,
         pointerEvents: 'none',
         zIndex: 0,
       }
@@ -146,7 +148,7 @@ export default function TemplateSelection() {
     if (isPrev) {
       return {
         opacity: 0.5,
-        transform: 'translateX(-68%) scale(0.75)',
+        transform: `translateX(-${isMobile ? '55' : '68'}%) scale(${isMobile ? '0.7' : '0.75'})`,
         zIndex: 2,
         pointerEvents: 'auto',
         filter: 'brightness(0.65)',
@@ -156,7 +158,7 @@ export default function TemplateSelection() {
     if (isNext) {
       return {
         opacity: 0.5,
-        transform: 'translateX(68%) scale(0.75)',
+        transform: `translateX(${isMobile ? '55' : '68'}%) scale(${isMobile ? '0.7' : '0.75'})`,
         zIndex: 2,
         pointerEvents: 'auto',
         filter: 'brightness(0.65)',
@@ -165,16 +167,16 @@ export default function TemplateSelection() {
   }
 
   return (
-    <div style={{ paddingTop: 88, paddingBottom: 40, minHeight: '100vh' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+    <div style={{ paddingTop: isMobile ? 76 : 88, paddingBottom: 40, minHeight: '100vh' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '0 16px' : '0 24px' }}>
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           style={{ textAlign: 'center', marginBottom: 36 }}
         >
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
+          <h1 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
             Pilih Template <span className="gradient-text">CV</span>
           </h1>
-          <p style={{ color: '#64748b', fontSize: 15 }}>
+          <p style={{ color: '#64748b', fontSize: isMobile ? 13 : 15 }}>
             Geser atau klik untuk melihat template — pilih yang paling sesuai
           </p>
         </motion.div>
@@ -193,8 +195,8 @@ export default function TemplateSelection() {
             onClick={goPrev}
             aria-label="Template sebelumnya"
             style={{
-              position: 'absolute', left: -24, top: '45%', transform: 'translateY(-50%)',
-              zIndex: 20, width: 46, height: 46, borderRadius: '50%',
+              position: 'absolute', left: isMobile ? 4 : -24, top: '45%', transform: 'translateY(-50%)',
+              zIndex: 20, width: isMobile ? 36 : 46, height: isMobile ? 36 : 46, borderRadius: '50%',
               background: 'white',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -211,8 +213,8 @@ export default function TemplateSelection() {
             onClick={goNext}
             aria-label="Template berikutnya"
             style={{
-              position: 'absolute', right: -24, top: '45%', transform: 'translateY(-50%)',
-              zIndex: 20, width: 46, height: 46, borderRadius: '50%',
+              position: 'absolute', right: isMobile ? 4 : -24, top: '45%', transform: 'translateY(-50%)',
+              zIndex: 20, width: isMobile ? 36 : 46, height: isMobile ? 36 : 46, borderRadius: '50%',
               background: 'white',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -232,7 +234,7 @@ export default function TemplateSelection() {
             onMouseUp={handleMouseUp}
             style={{
               position: 'relative',
-              height: 560,
+              height: isMobile ? 400 : 560,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -261,7 +263,7 @@ export default function TemplateSelection() {
                   }}
                   style={{
                     position: 'absolute',
-                    width: '48%',
+                    width: isMobile ? '65%' : '48%',
                     maxWidth: 440,
                     borderRadius: 16,
                     overflow: 'hidden',
