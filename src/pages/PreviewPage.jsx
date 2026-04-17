@@ -152,22 +152,139 @@ export default function PreviewPage() {
       // Wait for fonts to be loaded in the main document
       if (document.fonts?.ready) await document.fonts.ready
 
-      // Collect all font-related link tags (preconnect + stylesheet)
-      const fontLinks = Array.from(
-        document.querySelectorAll('link[rel="preconnect"], link[href*="fonts.googleapis.com"]')
-      ).map(l => l.outerHTML).join('\n')
+      if (isMobileDevice()) {
+        // ========== MOBILE: html2canvas + jsPDF via HIDDEN CLONE ==========
+        // We create a clean clone of the CV content in a hidden container
+        // at full 794px width — no CSS transforms, no scaling artifacts.
+        // This produces a direct PDF download without any print dialog
+        // (so no browser-imposed margins).
 
-      // Get the CV content HTML (all React inline styles are preserved)
-      const cvContent = element.innerHTML
+        const [html2canvasModule, jsPDFModule] = await Promise.all([
+          import('html2canvas'),
+          import('jspdf'),
+        ])
+        const html2canvas = html2canvasModule.default
+        const { jsPDF } = jsPDFModule
 
-      // Calculate page dimensions based on mode
-      const PX_TO_MM = 0.2646 // 1px at 96dpi ≈ 0.2646mm
-      const isA4 = pdfSizeMode === 'a4'
-      const pageHeightPx = isA4 ? 1123 : contentHeight
-      const pageHeightMm = isA4 ? 297 : Math.min(Math.ceil(contentHeight * PX_TO_MM) + 1, 297)
+        // Collect Google Fonts stylesheets
+        const fontStylesheets = Array.from(
+          document.querySelectorAll('link[href*="fonts.googleapis.com"][rel="stylesheet"]')
+        )
 
-      // Build a print-optimized HTML document
-      const printHTML = `<!DOCTYPE html>
+        // Create a hidden container for clean rendering
+        const container = document.createElement('div')
+        container.id = 'pdf-render-container'
+        container.style.cssText = `
+          position: fixed;
+          left: -9999px;
+          top: 0;
+          width: 794px;
+          min-height: 1123px;
+          background: white;
+          z-index: -9999;
+          opacity: 0;
+          pointer-events: none;
+          overflow: visible;
+        `
+
+        // Clone font links into a style block inside the container
+        // (html2canvas reads computed styles from the live DOM)
+        // The fonts are already loaded in the main document, so they'll be available
+
+        // Copy the CV HTML content into the container
+        container.innerHTML = element.innerHTML
+
+        document.body.appendChild(container)
+
+        // Wait for images inside the clone to load
+        const imgs = container.querySelectorAll('img')
+        if (imgs.length > 0) {
+          await Promise.all(
+            Array.from(imgs).map(img => {
+              if (img.complete && img.naturalWidth > 0) return Promise.resolve()
+              return new Promise(r => {
+                img.onload = r
+                img.onerror = r
+                setTimeout(r, 3000) // Don't wait forever per image
+              })
+            })
+          )
+        }
+
+        // Let the browser finish layout
+        await new Promise(r => setTimeout(r, 300))
+
+        // Get actual content height for dynamic sizing
+        const cloneHeight = Math.min(container.scrollHeight, 1123)
+
+        // Capture with html2canvas
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          width: 794,
+          height: cloneHeight,
+          windowWidth: 794,
+          logging: false,
+        })
+
+        // Remove the hidden container
+        container.remove()
+
+        // Calculate PDF dimensions
+        const isA4 = pdfSizeMode === 'a4'
+        const pdfWidthMm = 210
+        const canvasRatio = canvas.height / canvas.width
+        const pdfHeightMm = isA4 ? 297 : Math.min(Math.round(pdfWidthMm * canvasRatio), 297)
+
+        // Create PDF
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [pdfWidthMm, pdfHeightMm],
+        })
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.92)
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidthMm, pdfHeightMm)
+
+        // Generate filename
+        const fileName = `CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}.pdf`
+
+        // Direct download using Blob + anchor (no print dialog, no margins)
+        const pdfBlob = pdf.output('blob')
+        const url = URL.createObjectURL(pdfBlob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = fileName
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+        }, 200)
+
+      } else {
+        // ========== DESKTOP: window.open + print (original method) ==========
+
+        // Collect all font-related link tags (preconnect + stylesheet)
+        const fontLinks = Array.from(
+          document.querySelectorAll('link[rel="preconnect"], link[href*="fonts.googleapis.com"]')
+        ).map(l => l.outerHTML).join('\n')
+
+        // Get the CV content HTML
+        const cvContent = element.innerHTML
+
+        // Calculate page dimensions
+        const PX_TO_MM = 0.2646
+        const isA4 = pdfSizeMode === 'a4'
+        const pageHeightPx = isA4 ? 1123 : contentHeight
+        const pageHeightMm = isA4 ? 297 : Math.min(Math.ceil(contentHeight * PX_TO_MM) + 1, 297)
+
+        const printHTML = `<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -188,7 +305,6 @@ ${fontLinks}
     height: ${pageHeightPx}px;
     overflow: hidden;
     background: white;
-    /* Force print backgrounds and colors */
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
@@ -198,90 +314,6 @@ ${fontLinks}
 <body>${cvContent}</body>
 </html>`
 
-      if (isMobileDevice()) {
-        // ========== MOBILE: Hidden iframe + print ==========
-        // Using iframe avoids popup blockers while still using browser's
-        // native rendering engine for pixel-perfect output.
-
-        // Remove any previous print iframe
-        const existingFrame = document.getElementById('cv-print-iframe')
-        if (existingFrame) existingFrame.remove()
-
-        const iframe = document.createElement('iframe')
-        iframe.id = 'cv-print-iframe'
-        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;'
-        document.body.appendChild(iframe)
-
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
-        iframeDoc.open()
-        iframeDoc.write(printHTML)
-        iframeDoc.close()
-
-        // Wait for iframe content to load
-        await new Promise(resolve => {
-          if (iframeDoc.readyState === 'complete') {
-            resolve()
-          } else {
-            iframe.addEventListener('load', resolve)
-          }
-          setTimeout(resolve, 3000) // Fallback timeout
-        })
-
-        // Wait for Google Fonts to load inside iframe
-        if (iframeDoc.fonts?.ready) {
-          try {
-            await Promise.race([
-              iframeDoc.fonts.ready,
-              new Promise(r => setTimeout(r, 3000)), // Don't wait forever
-            ])
-          } catch { /* ignore font load errors */ }
-        }
-
-        // Wait for images to load inside iframe
-        const imgs = iframeDoc.querySelectorAll('img')
-        if (imgs.length > 0) {
-          await Promise.all(
-            Array.from(imgs).map(img =>
-              img.complete && img.naturalWidth > 0
-                ? Promise.resolve()
-                : new Promise(r => { img.onload = r; img.onerror = r; setTimeout(r, 2000) })
-            )
-          )
-        }
-
-        // Extra delay for final rendering settle
-        await new Promise(r => setTimeout(r, 500))
-
-        // Trigger print from iframe
-        try {
-          iframe.contentWindow.focus()
-          iframe.contentWindow.print()
-        } catch (printErr) {
-          console.warn('Iframe print failed, trying window.print fallback:', printErr)
-          // Fallback: try opening in new window
-          const printWin = window.open('', '_blank')
-          if (printWin) {
-            printWin.document.open()
-            printWin.document.write(printHTML)
-            printWin.document.close()
-            await new Promise(r => setTimeout(r, 1500))
-            printWin.focus()
-            printWin.print()
-            printWin.addEventListener('afterprint', () => printWin.close())
-            setTimeout(() => { if (!printWin.closed) printWin.close() }, 120000)
-          } else {
-            alert('Tidak bisa membuka dialog cetak. Izinkan popup untuk situs ini.')
-          }
-        }
-
-        // Cleanup iframe after a delay
-        setTimeout(() => {
-          const frame = document.getElementById('cv-print-iframe')
-          if (frame) frame.remove()
-        }, 5000)
-
-      } else {
-        // ========== DESKTOP: window.open + print (original method) ==========
         const printWin = window.open('', '_blank')
         if (!printWin) {
           alert('Popup diblokir oleh browser. Izinkan popup untuk situs ini, lalu coba lagi.')
@@ -293,23 +325,16 @@ ${fontLinks}
         printWin.document.write(printHTML)
         printWin.document.close()
 
-        // Wait for the new window to fully load content
         await new Promise(resolve => {
-          if (printWin.document.readyState === 'complete') {
-            resolve()
-          } else {
-            printWin.addEventListener('load', resolve)
-          }
-          // Fallback timeout in case load event already fired
+          if (printWin.document.readyState === 'complete') resolve()
+          else printWin.addEventListener('load', resolve)
           setTimeout(resolve, 2000)
         })
 
-        // Wait for Google Fonts to load in the print window
         if (printWin.document.fonts?.ready) {
           await printWin.document.fonts.ready
         }
 
-        // Wait for all images to load
         const imgs = printWin.document.querySelectorAll('img')
         if (imgs.length > 0) {
           await Promise.all(
@@ -321,16 +346,11 @@ ${fontLinks}
           )
         }
 
-        // Extra delay for final rendering settle
         await new Promise(r => setTimeout(r, 300))
 
-        // Trigger print → user saves as PDF from the print dialog
         printWin.focus()
         printWin.print()
-
-        // Auto-close the print window after the dialog is dismissed
         printWin.addEventListener('afterprint', () => printWin.close())
-        // Fallback: close after 2 minutes if afterprint event doesn't fire
         setTimeout(() => { if (!printWin.closed) printWin.close() }, 120000)
       }
 
