@@ -153,11 +153,10 @@ export default function PreviewPage() {
       if (document.fonts?.ready) await document.fonts.ready
 
       if (isMobileDevice()) {
-        // ========== MOBILE: html2canvas + jsPDF via HIDDEN CLONE ==========
-        // We create a clean clone of the CV content in a hidden container
-        // at full 794px width — no CSS transforms, no scaling artifacts.
-        // This produces a direct PDF download without any print dialog
-        // (so no browser-imposed margins).
+        // ========== MOBILE: html2canvas + jsPDF via cloneNode ==========
+        // Clone the exact preview element (preserving all inline styles and structure)
+        // then remove CSS transforms so html2canvas captures at full 794px width.
+        // Direct PDF download — no print dialog, no browser margins.
 
         const [html2canvasModule, jsPDFModule] = await Promise.all([
           import('html2canvas'),
@@ -166,37 +165,29 @@ export default function PreviewPage() {
         const html2canvas = html2canvasModule.default
         const { jsPDF } = jsPDFModule
 
-        // Collect Google Fonts stylesheets
-        const fontStylesheets = Array.from(
-          document.querySelectorAll('link[href*="fonts.googleapis.com"][rel="stylesheet"]')
-        )
+        // Deep clone the preview element — preserves exact DOM structure + inline styles
+        const clone = element.cloneNode(true)
 
-        // Create a hidden container for clean rendering
-        const container = document.createElement('div')
-        container.id = 'pdf-render-container'
-        container.style.cssText = `
-          position: fixed;
-          left: -9999px;
-          top: 0;
-          width: 794px;
-          min-height: 1123px;
-          background: white;
-          z-index: -9999;
-          pointer-events: none;
-          overflow: visible;
-        `
+        // Reset clone styles: remove transform/scale, negative margins, pointer-events
+        clone.style.transform = 'none'
+        clone.style.transformOrigin = 'top left'
+        clone.style.marginBottom = '0'
+        clone.style.marginRight = '0'
+        clone.style.pointerEvents = 'auto'
+        clone.style.maxHeight = 'none'
+        clone.style.width = '794px'
+        clone.style.position = 'fixed'
+        clone.style.left = '-9999px'
+        clone.style.top = '0'
+        clone.style.zIndex = '-9999'
+        clone.style.overflow = 'visible'
+        clone.style.background = 'white'
+        clone.id = 'pdf-clone-container'
 
-        // Clone font links into a style block inside the container
-        // (html2canvas reads computed styles from the live DOM)
-        // The fonts are already loaded in the main document, so they'll be available
-
-        // Copy the CV HTML content into the container
-        container.innerHTML = element.innerHTML
-
-        document.body.appendChild(container)
+        document.body.appendChild(clone)
 
         // Wait for images inside the clone to load
-        const imgs = container.querySelectorAll('img')
+        const imgs = clone.querySelectorAll('img')
         if (imgs.length > 0) {
           await Promise.all(
             Array.from(imgs).map(img => {
@@ -204,20 +195,20 @@ export default function PreviewPage() {
               return new Promise(r => {
                 img.onload = r
                 img.onerror = r
-                setTimeout(r, 3000) // Don't wait forever per image
+                setTimeout(r, 3000)
               })
             })
           )
         }
 
         // Let the browser finish layout
-        await new Promise(r => setTimeout(r, 300))
+        await new Promise(r => setTimeout(r, 200))
 
-        // Get actual content height for dynamic sizing
-        const cloneHeight = Math.min(container.scrollHeight, 1123)
+        // Measure actual content height (no min-height forcing whitespace)
+        const cloneHeight = clone.scrollHeight
 
-        // Capture with html2canvas
-        const canvas = await html2canvas(container, {
+        // Capture with html2canvas at full size
+        const canvas = await html2canvas(clone, {
           scale: 2,
           useCORS: true,
           allowTaint: true,
@@ -228,10 +219,10 @@ export default function PreviewPage() {
           logging: false,
         })
 
-        // Remove the hidden container
-        container.remove()
+        // Remove the clone
+        clone.remove()
 
-        // Calculate PDF dimensions
+        // Calculate PDF dimensions — match actual content ratio
         const isA4 = pdfSizeMode === 'a4'
         const pdfWidthMm = 210
         const canvasRatio = canvas.height / canvas.width
@@ -247,10 +238,8 @@ export default function PreviewPage() {
         const imgData = canvas.toDataURL('image/jpeg', 0.92)
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidthMm, pdfHeightMm)
 
-        // Generate filename
+        // Generate filename & download
         const fileName = `CV_${(personalInfo.name || 'Document').replace(/\s+/g, '_')}.pdf`
-
-        // Direct download using Blob + anchor (no print dialog, no margins)
         const pdfBlob = pdf.output('blob')
         const url = URL.createObjectURL(pdfBlob)
         const link = document.createElement('a')
