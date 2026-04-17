@@ -153,10 +153,11 @@ export default function PreviewPage() {
       if (document.fonts?.ready) await document.fonts.ready
 
       if (isMobileDevice()) {
-        // ========== MOBILE: html2canvas + jsPDF via cloneNode ==========
-        // Clone the exact preview element (preserving all inline styles and structure)
-        // then remove CSS transforms so html2canvas captures at full 794px width.
-        // Direct PDF download — no print dialog, no browser margins.
+        // ========== MOBILE: html2canvas + jsPDF (in-place capture) ==========
+        // Modify the original element temporarily (remove transform/scale),
+        // capture with html2canvas, then restore. This keeps the element in its
+        // natural DOM context so CSS flex/grid layouts render correctly.
+        // A white overlay hides the brief flash from the user.
 
         const [html2canvasModule, jsPDFModule] = await Promise.all([
           import('html2canvas'),
@@ -165,64 +166,68 @@ export default function PreviewPage() {
         const html2canvas = html2canvasModule.default
         const { jsPDF } = jsPDFModule
 
-        // Deep clone the preview element — preserves exact DOM structure + inline styles
-        const clone = element.cloneNode(true)
+        // Create overlay to hide the visual change during capture
+        const overlay = document.createElement('div')
+        overlay.style.cssText = 'position:fixed;inset:0;background:white;z-index:99999;display:flex;align-items:center;justify-content:center;'
+        overlay.innerHTML = '<div style="text-align:center;"><div style="width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#0ea5e9;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px;"></div><p style="color:#64748b;font-size:14px;margin:0;">Membuat PDF...</p></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>'
+        document.body.appendChild(overlay)
 
-        // Reset clone styles: remove transform/scale, negative margins, pointer-events
-        clone.style.transform = 'none'
-        clone.style.transformOrigin = 'top left'
-        clone.style.marginBottom = '0'
-        clone.style.marginRight = '0'
-        clone.style.pointerEvents = 'auto'
-        clone.style.maxHeight = 'none'
-        clone.style.width = '794px'
-        clone.style.position = 'fixed'
-        clone.style.left = '-9999px'
-        clone.style.top = '0'
-        clone.style.zIndex = '-9999'
-        clone.style.overflow = 'visible'
-        clone.style.background = 'white'
-        clone.id = 'pdf-clone-container'
-
-        document.body.appendChild(clone)
-
-        // Wait for images inside the clone to load
-        const imgs = clone.querySelectorAll('img')
-        if (imgs.length > 0) {
-          await Promise.all(
-            Array.from(imgs).map(img => {
-              if (img.complete && img.naturalWidth > 0) return Promise.resolve()
-              return new Promise(r => {
-                img.onload = r
-                img.onerror = r
-                setTimeout(r, 3000)
-              })
-            })
-          )
+        // Save original styles
+        const orig = {
+          transform: element.style.transform,
+          transformOrigin: element.style.transformOrigin,
+          marginBottom: element.style.marginBottom,
+          marginRight: element.style.marginRight,
+          pointerEvents: element.style.pointerEvents,
+          maxHeight: element.style.maxHeight,
+          overflow: element.style.overflow,
         }
 
-        // Let the browser finish layout
+        // Remove transform/scale so element renders at full 794px
+        element.style.transform = 'none'
+        element.style.transformOrigin = 'top left'
+        element.style.marginBottom = '0'
+        element.style.marginRight = '0'
+        element.style.pointerEvents = 'auto'
+        element.style.maxHeight = 'none'
+        element.style.overflow = 'visible'
+
+        // Wait for browser to re-layout at full size
         await new Promise(r => setTimeout(r, 200))
 
-        // Measure actual content height (no min-height forcing whitespace)
-        const cloneHeight = clone.scrollHeight
+        // Get full-size dimensions
+        const captureWidth = element.scrollWidth
+        const captureHeight = element.scrollHeight
 
-        // Capture with html2canvas at full size
-        const canvas = await html2canvas(clone, {
+        // Capture with html2canvas — element is in its natural DOM position
+        const canvas = await html2canvas(element, {
           scale: 2,
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          width: 794,
-          height: cloneHeight,
-          windowWidth: 794,
+          width: captureWidth,
+          height: captureHeight,
+          windowWidth: captureWidth,
+          x: 0,
+          y: 0,
+          scrollX: 0,
+          scrollY: 0,
           logging: false,
         })
 
-        // Remove the clone
-        clone.remove()
+        // Restore original styles immediately
+        element.style.transform = orig.transform
+        element.style.transformOrigin = orig.transformOrigin
+        element.style.marginBottom = orig.marginBottom
+        element.style.marginRight = orig.marginRight
+        element.style.pointerEvents = orig.pointerEvents
+        element.style.maxHeight = orig.maxHeight
+        element.style.overflow = orig.overflow
 
-        // Calculate PDF dimensions — match actual content ratio
+        // Remove overlay
+        overlay.remove()
+
+        // Calculate PDF dimensions
         const isA4 = pdfSizeMode === 'a4'
         const pdfWidthMm = 210
         const canvasRatio = canvas.height / canvas.width
